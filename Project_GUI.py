@@ -351,7 +351,7 @@ class NewProject(QDialog):
 
 
 if __name__ == "__main__":
-    QApplication.setStyle("windows")
+    QApplication.setStyle("fusion")
     app = QApplication(sys.argv)
     myWin = MyMainWindow()
     # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
