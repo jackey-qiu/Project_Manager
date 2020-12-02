@@ -47,6 +47,7 @@ class MyMainWindow(QMainWindow):
         self.widget_terminal.update_name_space('main_gui',self)
         self.pushButton_start_server.clicked.connect(self.connect_mongo_server)
         self.pushButton_stop_server.clicked.connect(self.stop_mongo_server)
+        self.pushButton_start_client.clicked.connect(self.start_mongo_client)
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
         self.pushButton_load.clicked.connect(self.load_project)
         self.pushButton_add_new_paper.clicked.connect(self.add_paper_info)
@@ -59,6 +60,11 @@ class MyMainWindow(QMainWindow):
         self.comboBox_section.currentIndexChanged.connect(self.update_tag_list_in_existing_input)
         self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
+        self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
+        self.pushButton_update_paper.clicked.connect(self.update_paper_info)
+        self.pushButton_remove_paper.clicked.connect(self.delete_one_paper)
+        self.pushButton_rename.clicked.connect(self.rename_tag)
+        self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
 
     def connect_mongo_server(self):
         #local server connection
@@ -68,12 +74,6 @@ class MyMainWindow(QMainWindow):
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
         error_pop_up('\n'.join([str(output),str(error)]), ['Information','Error'][int(error=='')])
-        try:
-            self.start_mongo_client()
-            self.comboBox_project_list.clear()
-            self.comboBox_project_list.addItems(self.get_database_in_a_list())
-        except Exception as e:
-            error_pop_up('Fail to start mongo client.'+'\n{}'.format(str(e)),'Error')
 
     def stop_mongo_server(self):
         bashCommand = "brew services stop mongodb-community@4.4"
@@ -82,7 +82,12 @@ class MyMainWindow(QMainWindow):
         error_pop_up('\n'.join([str(output),str(error)]), ['Information','Error'][int(error=='')])
 
     def start_mongo_client(self):
-        self.mongo_client = MongoClient('localhost:27017')
+        try:
+            self.mongo_client = MongoClient('localhost:27017')
+            self.comboBox_project_list.clear()
+            self.comboBox_project_list.addItems(self.get_database_in_a_list())
+        except Exception as e:
+            error_pop_up('Fail to start mongo client.'+'\n{}'.format(str(e)),'Error')
 
     def get_database_in_a_list(self):
         return self.mongo_client.list_database_names()
@@ -113,13 +118,37 @@ class MyMainWindow(QMainWindow):
     def get_papers_in_a_list(self):
         all_info = list(self.database.paper_info.find({},{'_id':0}))
         paper_id_list = [each['paper_id'] for each in all_info]
-        return paper_id_list
+        return sorted(paper_id_list)
 
     def update_paper_list_in_listwidget(self):
         papers = self.get_papers_in_a_list()
         papers = ['all'] + papers
         self.listWidget_papers.clear()
         self.listWidget_papers.addItems(papers)
+        #also update the paper list in the combobox
+        self.update_paper_list_in_combobox()
+
+    def update_paper_list_in_combobox(self):
+        papers = self.get_papers_in_a_list()
+        self.comboBox_paper_ids_new_input.clear()
+        self.comboBox_paper_ids_new_input.addItems(papers)
+        self.comboBox_paper_ids.clear()
+        self.comboBox_paper_ids.addItems(papers)
+        self.comboBox_papers.clear()
+        self.comboBox_papers.addItems(papers)
+
+    def rename_tag(self):
+        new_tag_name = self.lineEdit_renamed_tag.text()
+        original_tag_name = self.comboBox_tags.currentText()
+        reply = QMessageBox.question(self, 'Message', 'Sure to rename the tag?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if reply == QMessageBox.Yes:
+            for collection in self.database.list_collection_names():
+                self.database[collection].update_one({'tag_name':original_tag_name},{"$set": {"tag_name":new_tag_name}})
+            self.update_tag_list_in_listwidget()
+            self.update_tag_list_in_combo()
+            self.update_tag_list_in_existing_input()
+            self.statusbar.clearMessage()
+            self.statusbar.showMessage('The tag was renamed sucessfully!')
 
     def update_tag_list_in_listwidget(self):
         tags = self.get_tags_in_a_list()
@@ -133,7 +162,7 @@ class MyMainWindow(QMainWindow):
         for each in all_info:
             for each_item in each:
                 tag_list.append(each_item['tag_name'])
-        return tag_list
+        return sorted(tag_list)
 
     def update_tag_info_slot(self):
         collection_name = self.comboBox_section_tag_info.currentText()
@@ -158,8 +187,6 @@ class MyMainWindow(QMainWindow):
                         self.statusbar.clearMessage()
                         self.statusbar.showMessage('Update tag document info sucessfully!')
                     else:
-                        #print('I am here!')
-                        #print(self.database.tag_info.find_one({'tag_name':tag_name}))
                         pass
         except Exception as e:
             error_pop_up('Fail to append tag document info.\n{}'.format(str(e)),'Error')
@@ -176,39 +203,47 @@ class MyMainWindow(QMainWindow):
 
     def get_tag_list_by_collection_name(self, collection_name):
         tag_list = [each['tag_name'] for each in self.database.tag_info.find({'collection_name':collection_name})]
-        return tag_list
+        return sorted(tag_list)
 
     def update_tag_list_in_existing_input(self):
         collection = self.comboBox_section.currentText()
-        paper_id = self.lineEdit_paper_id.text()
+        paper_id = self.comboBox_paper_ids.currentText()
         tag_list = self.get_tag_list_by_paper_id_and_collection_name(paper_id, collection)
         self.comboBox_tag_list.clear()
         self.comboBox_tag_list.addItems(tag_list)
 
     def get_tag_list_by_paper_id_and_collection_name(self,paper_id,collection_name):
         tag_list = [each['tag_name'] for each in self.database[collection_name].find({'paper_id':paper_id})]
-        return tag_list
+        return sorted(tag_list)
 
     def update_tag_contents_slot(self):
-        paper_id = self.lineEdit_paper_id.text()
+        #paper_id = self.lineEdit_paper_id.text()
+        paper_id = self.comboBox_paper_ids.currentText()
         collection = self.comboBox_section.currentText()
         tag_name =  self.comboBox_tag_list.currentText()
         tag_content = self.textEdit_tag_conent.toPlainText()
+        location = self.lineEdit_location.text()
         reply = QMessageBox.question(self, 'Message', 'Would you like to update your database with new input?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
         if reply == QMessageBox.Yes:
-            self.update_tag_contents(paper_id, collection, tag_name, tag_content)
+            self.update_tag_contents(paper_id, collection, tag_name, tag_content,location)
         else:
             pass
 
-    def update_tag_contents(self,paper_id, collection, tag_name, tag_content_in_plain_text):
+    def update_tag_contents(self,paper_id, collection, tag_name, tag_content_in_plain_text,location):
         #target = self.database[collection].find({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})
         self.database[collection].update_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]},{ "$set": { "tag_content": tag_content_in_plain_text.rsplit('\n')}})
+        self.database[collection].update_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]},{ "$set": { "location": location.rstrip().rsplit(',')}})
 
     def extract_tag_contents_slot(self):
-        paper_id = self.lineEdit_paper_id.text()
+        #paper_id = self.lineEdit_paper_id.text()
+        paper_id = self.comboBox_paper_ids.currentText()
         collection = self.comboBox_section.currentText()
         tag_name =  self.comboBox_tag_list.currentText()
         self.textEdit_tag_conent.setPlainText(self.extract_tag_contents(paper_id, collection, tag_name))
+        locations = [each['location'] for each in self.database[collection].find({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})]
+        # print(locations)
+        if len(locations)!=0:
+            self.lineEdit_location.setText(','.join(locations[0]))
 
     def extract_tag_contents(self, paper_id, collection, tag_name):
         contents = [each['tag_content'] for each in self.database[collection].find({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})]
@@ -218,11 +253,16 @@ class MyMainWindow(QMainWindow):
             return ''
 
     def append_new_input(self):
-        paper_id = self.lineEdit_paper_id_new_input.text()
+        #paper_id = self.lineEdit_paper_id_new_input.text()
+        paper_id = self.comboBox_paper_ids_new_input.currentText()
         collection = self.comboBox_section_new_input.currentText()
         tag_name = self.lineEdit_tag_new_input.text()
         tag_content = self.textEdit_tag_content_new_input.toPlainText()
         location = self.lineEdit_location_new_input.text()
+        if self.checkBox_check_tag.isChecked():
+            if tag_name in self.get_tags_in_a_list():
+                error_pop_up('This is supposed to be a new tag, but the tag you provided is already existed. \nPick a different one please! If it is supposed to be an existed tag, check off the newtag checkbox! And do again!','Error')
+                return
         if collection in self.database.list_collection_names():
             if self.database[collection].find_one({'tag_name':tag_name})==None:
                 self.database[collection].insert_one({'paper_id':paper_id,'tag_name':tag_name,'tag_content':[tag_content],'location':[location]})
@@ -244,13 +284,82 @@ class MyMainWindow(QMainWindow):
         all_info = list(self.mongo_client[name_db].paper_info.find(tag,{'_id':0}))
         return all_info
 
-    def add_paper_info(self):
-        paper_info = {'first_author':self.lineEdit_1st_author.text(),
+    def extract_paper_info(self):
+        paper_id = self.comboBox_papers.currentText()
+        target = self.database.paper_info.find_one({'paper_id':paper_id})
+        paper_info = {'first_author':self.lineEdit_1st_author.setText,
+                      'full_authors':self.lineEdit_full_author.setText,
+                      'paper_type':self.lineEdit_paper_type.setText,
+                      'journal':self.lineEdit_journal.setText,
+                      'volume':self.lineEdit_volume.setText,
+                      'issue':self.lineEdit_issue.setText,
+                      'page':self.lineEdit_page.setText,
+                      'year':self.lineEdit_year.setText,
+                      'title':self.lineEdit_title.setText,
+                      'url':self.lineEdit_url.setText,
+                      'doi':self.lineEdit_doi.setText,
+                      'abstract':self.textEdit_abstract.setPlainText
+                      }
+        for key, item in paper_info.items():
+            if key in target:
+                item(target[key])
+            else:
+                item('')
+
+    def delete_one_paper(self):
+        paper_id = self.comboBox_papers.currentText()
+        reply = QMessageBox.question(self, 'Message', 'Are you sure to delete this paper?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if reply == QMessageBox.Yes:
+            try:
+                for collection in self.database.list_collection_names():
+                    self.database[collection].delete_many({'paper_id':paper_id})
+                self.statusbar.clearMessage()
+                self.statusbar.showMessage('Update the paper info successfully:-)')
+                self.update_paper_list_in_listwidget()
+            except:
+                error_pop_up('Fail to delete the paper info!','Error')
+
+    def update_paper_info(self):
+        paper_id = self.comboBox_papers.currentText()
+        original = self.database.paper_info.find_one({'paper_id':paper_id})
+        paper_info_new = {
+                      'paper_id':paper_id,
+                      'first_author':self.lineEdit_1st_author.text(),
+                      'full_authors':self.lineEdit_full_author.text(),
+                      'paper_type':self.lineEdit_paper_type.text(),
                       'journal':self.lineEdit_journal.text(),
+                      'volume':self.lineEdit_volume.text(),
+                      'issue':self.lineEdit_issue.text(),
+                      'page':self.lineEdit_page.text(),
                       'year':self.lineEdit_year.text(),
                       'title':self.lineEdit_title.text(),
                       'url':self.lineEdit_url.text(),
-                      'doi':self.lineEdit_doi.text()
+                      'doi':self.lineEdit_doi.text(),
+                      'abstract':self.textEdit_abstract.toPlainText().replace('\n',' ')
+                    }
+        try:        
+            reply = QMessageBox.question(self, 'Message', 'Would you like to update your database with new input?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if reply == QMessageBox.Yes:
+                self.database.paper_info.replace_one(original,paper_info_new)
+            self.statusbar.clearMessage()
+            self.statusbar.showMessage('Update the paper info successfully:-)')
+        except Exception as e:
+            error_pop_up('Fail to update the paper info :-(\n{}'.format(str(e)),'Error')
+
+    #create a new paper record in database
+    def add_paper_info(self):
+        paper_info = {'first_author':self.lineEdit_1st_author.text(),
+                      'full_authors':self.lineEdit_full_author.text(),
+                      'paper_type':self.lineEdit_paper_type.text(),
+                      'journal':self.lineEdit_journal.text(),
+                      'volume':self.lineEdit_volume.text(),
+                      'issue':self.lineEdit_issue.text(),
+                      'page':self.lineEdit_page.text(),
+                      'year':self.lineEdit_year.text(),
+                      'title':self.lineEdit_title.text(),
+                      'url':self.lineEdit_url.text(),
+                      'doi':self.lineEdit_doi.text(),
+                      'abstract':self.textEdit_abstract.toPlainText().replace('\n',' ')
                       }
         paper_id_temp = paper_info['first_author']+'_'+paper_info['year']+'_'
         papers = self.get_papers_in_a_list()
@@ -270,7 +379,6 @@ class MyMainWindow(QMainWindow):
         except Exception as e:
             error_pop_up('Failure to append paper info!\n{}'.format(str(e)),'Error')
 
-
     def extract_all_info(self):
         text_box = []
         paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
@@ -278,18 +386,19 @@ class MyMainWindow(QMainWindow):
 
         #extract tag content from collection
         def make_text(text_box, collection):
-            # print(collection)
             target = self.database[collection].find({'paper_id':paper_id_list[0]})
             text_box.append('\n##{}##'.format(collection))
+            ii = 0
             for each in target:
-                # print(each)
+                ii += 1
                 text_box.append('  '+each['tag_name'])
                 for i,each_tag_content in enumerate(each['tag_content']):
-                    #print()
                     if i>=len(each['location']):
                         text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content))
                     else:
                         text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content))
+            if ii == 0:
+                text_box.pop()
             return text_box
 
         #extract tag conent from collection with tag_name for papers with paper_ids
@@ -299,13 +408,16 @@ class MyMainWindow(QMainWindow):
             for paper_id in paper_id_list:
                 text_box.append('    '+paper_id)
                 target = self.database[collection].find({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
+                ii = 0
                 for each in target:
-                    #text_box.append('      '+each['tag_name'])
+                    ii += 1
                     for i,each_tag_content in enumerate(each['tag_content']):
                         if i>=len(each['location']):
                             text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content))
                         else:
                             text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content))
+                if ii == 0:
+                    text_box.pop()
             return text_box
 
         if 'all' in paper_id_list:
@@ -333,22 +445,27 @@ class MyMainWindow(QMainWindow):
 
     def extract_info_with_tag_for_one_paper(self,paper,tag):
         return list(self.database[paper].find({'tag_name':tag}))
-
     
-    def open_url_in_webbrowser(self,url):
-        webbrowser.open(url)
+    def open_url_in_webbrowser(self):
+        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        if 'all' in paper_id_list:
+            paper_id_list = self.get_papers_in_a_list()
+        if len(paper_id_list) != 0:
+            for paper_id in paper_id_list:
+                url = self.database.paper_info.find_one({'paper_id':paper_id})['url']
+                if url!='':
+                    webbrowser.open(url)
+                
 
 class NewProject(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         # Load the dialog's GUI
-        uic.loadUi("new_project_dialog.ui", self)
+        uic.loadUi(os.path.join(script_path,"new_project_dialog.ui"), self)
         self.pushButton_ok.clicked.connect(lambda:parent.creat_a_new_project(name_db = self.lineEdit_name.text(), 
                                                                              db_info = self.textEdit_introduction.toPlainText(),
                                                                              type_db ='paper'))
         self.pushButton_cancel.clicked.connect(lambda:self.close())
-
-
 
 if __name__ == "__main__":
     QApplication.setStyle("fusion")
