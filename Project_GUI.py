@@ -1,8 +1,10 @@
 import sys,os,qdarkstyle
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QMenu
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import uic, QtCore
+from PyQt5.QtGui import QCursor
+import PyQt5
 import pyqtgraph as pg
 import random,copy
 import numpy as np
@@ -25,6 +27,11 @@ import sys,os
 import subprocess
 from pymongo import MongoClient
 import webbrowser
+import qpageview.viewactions
+import base64
+from PIL import ImageGrab
+import io
+import codecs
 
 def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warning'][0]):
     msg = QMessageBox()
@@ -40,15 +47,42 @@ def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warn
     msg.setWindowTitle(window_title)
     msg.exec_()
 
+def image_to_64base_string(image_path):
+    with open(image_path, "rb") as img_file:
+         my_string = base64.b64encode(img_file.read())
+    return my_string
+
+def image_string_to_qimage(my_string, img_format = 'PNG'):
+    QByteArr = PyQt5.QtCore.QByteArray.fromBase64(my_string)
+    QImage = PyQt5.QtGui.QImage()
+    QImage.loadFromData(QByteArr, img_format)
+    return QImage
+
 class MyMainWindow(QMainWindow):
     def __init__(self, parent = None):
         super(MyMainWindow, self).__init__(parent)
         uic.loadUi(os.path.join(script_path,'project_manager.ui'),self)
+        self.setWindowTitle('Scientific Project Manager')
+        self.base64_string_temp = ''
+        self.base64_string_new_input_temp = ''
+        self.meta_figure_base_strings = []
+        self.action = qpageview.viewactions.ViewActions(self)
+        self.action.setView(self.widget_view)
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&View')
+        fileMenu.addAction(self.action.fit_both)
+        fileMenu.addAction(self.action.fit_height)
+        fileMenu.addAction(self.action.fit_width)
+        fileMenu.addAction(self.action.zoom_in)
+        fileMenu.addAction(self.action.zoom_out)
+        fileMenu.addAction(self.action.next_page)
+        fileMenu.addAction(self.action.previous_page)
         self.widget_terminal.update_name_space('main_gui',self)
         self.pushButton_start_server.clicked.connect(self.connect_mongo_server)
         self.pushButton_stop_server.clicked.connect(self.stop_mongo_server)
         self.pushButton_start_client.clicked.connect(self.start_mongo_client)
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
+        self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
         self.pushButton_add_new_paper.clicked.connect(self.add_paper_info)
         self.comboBox_tags.currentIndexChanged.connect(self.display_tag_info)
@@ -65,6 +99,76 @@ class MyMainWindow(QMainWindow):
         self.pushButton_remove_paper.clicked.connect(self.delete_one_paper)
         self.pushButton_rename.clicked.connect(self.rename_tag)
         self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
+        self.pushButton_paste_image.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_view,'base64_string_temp'))
+        self.pushButton_open_image.clicked.connect(lambda:self.open_image_file(self.widget_view,'base64_string_temp'))
+        self.pushButton_paste_figure.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_figure_input,'base64_string_new_input_temp'))
+        self.pushButton_load_figure.clicked.connect(lambda:self.open_image_file(self.widget_figure_input,'base64_string_new_input_temp'))
+        self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
+
+    def open_image_file(self, widget_view, base64_string = 'base64_string_temp'):
+        self.action.setView(widget_view)
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","image file (*.*)", options=options)
+        if fileName:
+            base64_data = image_to_64base_string(fileName)
+            #self.base64_string_temp = base64_data
+            setattr(self, base64_string, base64_data)
+            widget_view.clear()
+            widget_view.loadImages([image_string_to_qimage(base64_data, img_format = 'PNG')])
+            widget_view.show()
+
+    def paste_image_to_viewer_from_clipboard(self, widget_view, base64_string = 'base64_string_temp'):
+        self.action.setView(widget_view)
+        # Pull image from clibpoard
+        img = ImageGrab.grabclipboard()
+        # Get raw bytes
+        img_bytes = io.BytesIO()
+        try:
+            img.save(img_bytes, format='PNG')
+            # Convert bytes to base64
+            base64_data = codecs.encode(img_bytes.getvalue(), 'base64')
+            setattr(self, base64_string, base64_data)
+            #self.base64_string_temp = base64_data
+            widget_view.clear()
+            widget_view.loadImages([image_string_to_qimage(base64_data, img_format = 'PNG')])
+            widget_view.show()
+        except:
+            error_pop_up('Fail to paste image from clipboard.','Error')
+            return
+
+    def convert_clipboard_buffer_to_base64_string(self):
+        # Pull image from clibpoard
+        img = ImageGrab.grabclipboard()
+        # Get raw bytes
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format='PNG')
+        # Convert bytes to base64
+        base64_data = codecs.encode(img_bytes.getvalue(), 'base64')
+        return base64_data, 'PNG'
+
+    def load_graphical_abstract(self,base64_string):
+        self.base64_string_temp = base64_string
+        qimage = image_string_to_qimage(base64_string, 'PNG')
+        self.widget_view.clear()
+        self.widget_view.loadImages([qimage])
+        self.widget_view.show()
+
+    def load_figure_from_database(self):
+        self.action.setView(self.widget_figure_existing)
+        paper_id = self.lineEdit_paper_id_figure.text()
+        section = self.comboBox_section_figure.currentText()
+        tag_name = self.lineEdit_tag_name_figure.text()
+        target = self.database[section].find_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})
+        tag_contents = target['tag_content']
+        try:
+            figures_strings = [each for each in tag_contents if type(each)==type(b'')]
+            figures_qimages = [image_string_to_qimage(each, 'PNG') for each in figures_strings]
+            self.widget_figure_existing.clear()
+            self.widget_figure_existing.loadImages(figures_qimages)
+            self.widget_figure_existing.show()
+        except Exception as e:
+            error_pop_up('Fail to load figure from database,\n{}'.format(str(e)),'Error')
 
     def connect_mongo_server(self):
         #local server connection
@@ -101,6 +205,14 @@ class MyMainWindow(QMainWindow):
         self.extract_project_info()
         self.update_paper_list_in_listwidget()
         self.update_tag_list_in_listwidget()
+
+    def update_project_info(self):
+        try:
+            self.database.project_info.drop()
+            self.database.project_info.insert_many([{'project_info':self.plainTextEdit_project_info.toPlainText()}])
+            error_pop_up('Project information has been updated successfully!','Information')
+        except Exception as e:
+            error_pop_up('Failure to update Project information!','Error')
 
     def new_project_dialog(self):
         dlg = NewProject(self)
@@ -230,8 +342,13 @@ class MyMainWindow(QMainWindow):
             pass
 
     def update_tag_contents(self,paper_id, collection, tag_name, tag_content_in_plain_text,location):
-        #target = self.database[collection].find({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})
-        self.database[collection].update_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]},{ "$set": { "tag_content": tag_content_in_plain_text.rsplit('\n')}})
+        tag_content_list = tag_content_in_plain_text.rsplit('\n')
+        for i, each in enumerate(self.meta_figure_base_strings):
+            if each!='':
+                tag_content_list[i] = each
+            else:
+                pass
+        self.database[collection].update_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]},{ "$set": { "tag_content": tag_content_list}})
         self.database[collection].update_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]},{ "$set": { "location": location.rstrip().rsplit(',')}})
 
     def extract_tag_contents_slot(self):
@@ -247,6 +364,15 @@ class MyMainWindow(QMainWindow):
 
     def extract_tag_contents(self, paper_id, collection, tag_name):
         contents = [each['tag_content'] for each in self.database[collection].find({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})]
+        self.meta_figure_base_strings = []
+        #identify figure string
+        if len(contents)!=0:
+            for i,each in enumerate(contents[0]):
+                if type(each)==type(b''):
+                    self.meta_figure_base_strings.append(each)
+                    contents[0][i] = '<<figure string>>NOT SHOWING HERE!'
+                else:
+                    self.meta_figure_base_strings.append('')
         if len(contents)!=0:
             return '\n'.join(contents[0])
         else:
@@ -263,6 +389,13 @@ class MyMainWindow(QMainWindow):
             if tag_name in self.get_tags_in_a_list():
                 error_pop_up('This is supposed to be a new tag, but the tag you provided is already existed. \nPick a different one please! If it is supposed to be an existed tag, check off the newtag checkbox! And do again!','Error')
                 return
+        if self.checkBox_figure.isChecked():
+            if self.base64_string_new_input_temp == '':
+                error_pop_up('This is supposed to be a figure tag, please load a figure or paste a figure first!','Error')
+                return 
+            else:
+                #set tag_content to the figure string
+                tag_content = self.base64_string_new_input_temp
         if collection in self.database.list_collection_names():
             if self.database[collection].find_one({'tag_name':tag_name})==None:
                 self.database[collection].insert_one({'paper_id':paper_id,'tag_name':tag_name,'tag_content':[tag_content],'location':[location]})
@@ -279,6 +412,8 @@ class MyMainWindow(QMainWindow):
             self.update_tag_list_in_listwidget()
         else:
             pass
+        #set this back to ''
+        self.base64_string_new_input_temp = ''
 
     def get_papers_by_tag(self, name_db, tag = {'first_author':'qiu'}):
         all_info = list(self.mongo_client[name_db].paper_info.find(tag,{'_id':0}))
@@ -298,13 +433,17 @@ class MyMainWindow(QMainWindow):
                       'title':self.lineEdit_title.setText,
                       'url':self.lineEdit_url.setText,
                       'doi':self.lineEdit_doi.setText,
-                      'abstract':self.textEdit_abstract.setPlainText
+                      'abstract':self.textEdit_abstract.setPlainText,
+                      'graphical_abstract':self.load_graphical_abstract
                       }
         for key, item in paper_info.items():
             if key in target:
                 item(target[key])
             else:
-                item('')
+                if key == 'graphical_abstract':
+                    pass
+                else:
+                    item('')
 
     def delete_one_paper(self):
         paper_id = self.comboBox_papers.currentText()
@@ -335,7 +474,8 @@ class MyMainWindow(QMainWindow):
                       'title':self.lineEdit_title.text(),
                       'url':self.lineEdit_url.text(),
                       'doi':self.lineEdit_doi.text(),
-                      'abstract':self.textEdit_abstract.toPlainText().replace('\n',' ')
+                      'abstract':self.textEdit_abstract.toPlainText().replace('\n',' '),
+                      'graphical_abstract':self.base64_string_temp
                     }
         try:        
             reply = QMessageBox.question(self, 'Message', 'Would you like to update your database with new input?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
@@ -359,7 +499,8 @@ class MyMainWindow(QMainWindow):
                       'title':self.lineEdit_title.text(),
                       'url':self.lineEdit_url.text(),
                       'doi':self.lineEdit_doi.text(),
-                      'abstract':self.textEdit_abstract.toPlainText().replace('\n',' ')
+                      'abstract':self.textEdit_abstract.toPlainText().replace('\n',' '),
+                      'graphical_abstract':self.base64_string_temp
                       }
         paper_id_temp = paper_info['first_author']+'_'+paper_info['year']+'_'
         papers = self.get_papers_in_a_list()
@@ -393,6 +534,8 @@ class MyMainWindow(QMainWindow):
                 ii += 1
                 text_box.append('  '+each['tag_name'])
                 for i,each_tag_content in enumerate(each['tag_content']):
+                    if type(each_tag_content)==type(b''):
+                        each_tag_content = '<<figure string>>NOT SHOWING HERE!'
                     if i>=len(each['location']):
                         text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content))
                     else:
@@ -405,6 +548,7 @@ class MyMainWindow(QMainWindow):
         def make_text2(text_box, collection, tag_name, paper_id_list):
             text_box.append('\n##{}##'.format(collection))
             text_box.append('  '+tag_name)
+            jj = 0
             for paper_id in paper_id_list:
                 text_box.append('    '+paper_id)
                 target = self.database[collection].find({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
@@ -412,12 +556,20 @@ class MyMainWindow(QMainWindow):
                 for each in target:
                     ii += 1
                     for i,each_tag_content in enumerate(each['tag_content']):
+                        if type(each_tag_content)==type(b''):
+                            each_tag_content = '<<figure string>>NOT SHOWING HERE!'
+                            jj+=1
                         if i>=len(each['location']):
                             text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content))
+                            jj+=1
                         else:
                             text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content))
+                            jj+=1
                 if ii == 0:
                     text_box.pop()
+            if jj==0:#if not record is found then delete the header info
+                text_box.pop()
+                text_box.pop()
             return text_box
 
         if 'all' in paper_id_list:
@@ -438,8 +590,9 @@ class MyMainWindow(QMainWindow):
         elif len(paper_id_list)>1:
             collections = ['questions','methods','results','discussions','terminology','grammer']
             for each in collections:
-                tag_names = [each_item['tag_name'] for each_item in self.database.tag_info.find({'collection_name':each})]
-                for each_tag in tag_names:
+                # tag_names = [each_item['tag_name'] for each_item in self.database.tag_info.find({'collection_name':each})]
+                # tag_names = [each_item['tag_name'] for each_item in self.database.tag_info.find({'collection_name':each})]
+                for each_tag in tag_list:
                     text_box = make_text2(text_box, each, each_tag, paper_id_list)
         self.plainTextEdit_query_info.setPlainText('\n'.join(text_box))
 
@@ -468,7 +621,7 @@ class NewProject(QDialog):
         self.pushButton_cancel.clicked.connect(lambda:self.close())
 
 if __name__ == "__main__":
-    QApplication.setStyle("fusion")
+    QApplication.setStyle("windows")
     app = QApplication(sys.argv)
     myWin = MyMainWindow()
     # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
