@@ -355,7 +355,7 @@
                 <item>
                  <widget class="QTabWidget" name="tabWidget_2">
                   <property name="currentIndex">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <widget class="QWidget" name="tab_5">
                    <attribute name="title">
@@ -963,6 +963,13 @@
                          <widget class="QPushButton" name="pushButton_update_info">
                           <property name="text">
                            <string>UpdateInfo</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="pushButton_delete_tag">
+                          <property name="text">
+                           <string>DeleteTag</string>
                           </property>
                          </widget>
                         </item>

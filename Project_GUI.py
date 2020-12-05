@@ -108,6 +108,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
         self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
         self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
+        self.pushButton_delete_tag.clicked.connect(self.delete_tag)
 
     def open_image_file(self, widget_view, base64_string = 'base64_string_temp'):
         self.action.setView(widget_view)
@@ -368,6 +369,23 @@ class MyMainWindow(QMainWindow):
             self.update_tag_contents(paper_id, collection, tag_name, tag_content,location)
         else:
             pass
+
+    def delete_tag(self):
+        #paper_id = self.lineEdit_paper_id.text()
+        paper_id = self.comboBox_paper_ids.currentText()
+        collection = self.comboBox_section.currentText()
+        tag_name =  self.comboBox_tag_list.currentText()
+        #tag_content = self.textEdit_tag_conent.toPlainText()
+        #location = self.lineEdit_location.text()
+        reply = QMessageBox.question(self, 'Message', 'Are you sure to delete this tag (no way to have the deleted tag content back)?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if reply == QMessageBox.Yes:
+            try:
+                self.database[collection].delete_one({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
+                self.update_tag_list_after_delete()
+                self.update_tag_list_in_listwidget()
+                self.statusbar.showMessage('tag {} was deleted!'.format(tag_name))
+            except Exception as e:
+                error_pop_up('Could not delete the tag {}, since {}'.format(tag_name, str(e)))
 
     def update_tag_contents(self,paper_id, collection, tag_name, tag_content_in_plain_text,location):
         tag_content_list = tag_content_in_plain_text.rsplit('\n')
