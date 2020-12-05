@@ -1,4 +1,5 @@
 import sys,os,qdarkstyle
+import ntpath
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QMenu
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
@@ -29,6 +30,7 @@ from pymongo import MongoClient
 import webbrowser
 import qpageview.viewactions
 import base64
+from gridfs import GridFS
 from PIL import ImageGrab
 import io
 import codecs
@@ -104,6 +106,8 @@ class MyMainWindow(QMainWindow):
         self.pushButton_paste_figure.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_load_figure.clicked.connect(lambda:self.open_image_file(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
+        self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
+        self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
 
     def open_image_file(self, widget_view, base64_string = 'base64_string_temp'):
         self.action.setView(widget_view)
@@ -202,9 +206,11 @@ class MyMainWindow(QMainWindow):
 
     def load_project(self):
         self.database = self.mongo_client[self.comboBox_project_list.currentText()]
+
         self.extract_project_info()
         self.update_paper_list_in_listwidget()
         self.update_tag_list_in_listwidget()
+        self.create_instance_for_file_storage()
 
     def update_project_info(self):
         try:
@@ -226,11 +232,33 @@ class MyMainWindow(QMainWindow):
         self.comboBox_project_list.addItems(self.get_database_in_a_list())
         self.comboBox_project_list.setCurrentText(name_db)
         self.extract_project_info()
+        self.create_instance_for_file_storage()
+
+    def create_instance_for_file_storage(self, file_type = 'pdf_file'):
+        if not hasattr(self, 'file_worker'):
+            self.file_worker = GFS(self.database, file_type)
+        else:
+            self.file_worker.update_database(self.database)
 
     def get_papers_in_a_list(self):
         all_info = list(self.database.paper_info.find({},{'_id':0}))
         paper_id_list = [each['paper_id'] for each in all_info]
         return sorted(paper_id_list)
+
+    def update_tag_list_after_delete(self):
+        paper_id_list = self.get_papers_in_a_list()
+        tags = []
+        for each in paper_id_list:
+            #collections = ['methods']
+            collections = ['questions','methods','results','discussions','terminology','grammer']
+            for collection in collections:
+                tags += [each_item['tag_name'] for each_item in self.database[collection].find()]
+        tags = list(set(tags))
+        tags_before = self.get_tags_in_a_list()
+        for each in tags_before:
+            if each not in tags:
+                self.database.tag_info.delete_one({'tag_name':each})
+        self.update_tag_list_in_listwidget()
 
     def update_paper_list_in_listwidget(self):
         papers = self.get_papers_in_a_list()
@@ -422,6 +450,8 @@ class MyMainWindow(QMainWindow):
     def extract_paper_info(self):
         paper_id = self.comboBox_papers.currentText()
         target = self.database.paper_info.find_one({'paper_id':paper_id})
+        #set the pdf block to '' first
+        self.lineEdit_pdf.setText('')
         paper_info = {'first_author':self.lineEdit_1st_author.setText,
                       'full_authors':self.lineEdit_full_author.setText,
                       'paper_type':self.lineEdit_paper_type.setText,
@@ -444,6 +474,12 @@ class MyMainWindow(QMainWindow):
                     pass
                 else:
                     item('')
+        pdf = self.file_worker._getID(query = {'paper_id':paper_id})
+        if pdf!=None:
+            self.lineEdit_pdf.setText(str(pdf))
+        else:
+            self.lineEdit_pdf.setText('Not existing!')
+
 
     def delete_one_paper(self):
         paper_id = self.comboBox_papers.currentText()
@@ -452,11 +488,33 @@ class MyMainWindow(QMainWindow):
             try:
                 for collection in self.database.list_collection_names():
                     self.database[collection].delete_many({'paper_id':paper_id})
+                self.update_tag_list_after_delete()
+                self.delete_pdf_file()
                 self.statusbar.clearMessage()
                 self.statusbar.showMessage('Update the paper info successfully:-)')
                 self.update_paper_list_in_listwidget()
             except:
                 error_pop_up('Fail to delete the paper info!','Error')
+
+    def delete_pdf_file(self):
+        try:
+            self.file_worker.remove(self.comboBox_papers.currentText())
+        except Exception as e:
+            error_pop_up('Fail to delete the pdf file.\n{}'.format(str(e)),'Error')
+
+    def open_pdf_file(self):
+        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        if 'all' in paper_id_list:
+            paper_id_list = self.get_papers_in_a_list()
+        if len(paper_id_list)>0:
+            paper_id = paper_id_list[0]
+            try:
+                full_path = self.file_worker.write_2_disk(paper_id, os.path.join(script_path,'temp_pdf_files'))
+                webbrowser.open_new(r'file://{}'.format(full_path))
+            except Exception as e:
+                error_pop_up('Fail to open the pdf file.\n{}'.format(str(e)),'Error')
+        else:
+            pass
 
     def update_paper_info(self):
         paper_id = self.comboBox_papers.currentText()
@@ -481,6 +539,10 @@ class MyMainWindow(QMainWindow):
             reply = QMessageBox.question(self, 'Message', 'Would you like to update your database with new input?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if reply == QMessageBox.Yes:
                 self.database.paper_info.replace_one(original,paper_info_new)
+                #also update the pdf file
+                if os.path.exists(self.lineEdit_pdf.text()):
+                    self.file_worker.remove(paper_id)
+                    self.file_worker.insertFile(filePath = self.lineEdit_pdf.text(),paper_id = paper_id)
             self.statusbar.clearMessage()
             self.statusbar.showMessage('Update the paper info successfully:-)')
         except Exception as e:
@@ -512,10 +574,16 @@ class MyMainWindow(QMainWindow):
                 paper_id_temp = paper_id_temp + str(i)
                 break
         paper_info['paper_id'] = paper_id_temp
+        # if os.path.exists(self.lineEdit_pdf.text()):
+            # self.file_worker.insertFile(filePath = self.lineEdit_pdf.text(),paper_id = paper_id_temp)
         try:
             self.database.paper_info.insert_one(paper_info)
             self.statusbar.clearMessage()
             self.statusbar.showMessage('Append the paper info sucessfully!')
+            #also store the pdf file
+            if os.path.exists(self.lineEdit_pdf.text()):
+                self.file_worker.insertFile(filePath = self.lineEdit_pdf.text(),paper_id = paper_id_temp)
+                self.statusbar.showMessage('Archive PDF file sucessfully!')
             self.update_paper_list_in_listwidget()
         except Exception as e:
             error_pop_up('Failure to append paper info!\n{}'.format(str(e)),'Error')
@@ -608,7 +676,6 @@ class MyMainWindow(QMainWindow):
                 url = self.database.paper_info.find_one({'paper_id':paper_id})['url']
                 if url!='':
                     webbrowser.open(url)
-                
 
 class NewProject(QDialog):
     def __init__(self, parent=None):
@@ -620,10 +687,80 @@ class NewProject(QDialog):
                                                                              type_db ='paper'))
         self.pushButton_cancel.clicked.connect(lambda:self.close())
 
+#class to store to and rechieve file from database
+class GFS(object):
+    def __init__(self, db, file_table = 'pdf_file'):
+        self.db = db
+        self.file_table = file_table
+        self.fs = GridFS(db, file_table)
+ 
+    def update_database(self, new_db):
+        self.db = new_db
+        #the collection name will be '{}.files'.format(self.file_table)
+        self.fs = GridFS(new_db, self.file_table)
+
+    def insertFile(self,filePath,paper_id): #将文件存入数据表
+        if self.fs.exists({'paper_id':paper_id}):
+            error_pop_up('The file is existent already.','Error')
+        else:
+            with open(filePath,'rb') as fileObj:
+                data = fileObj.read()
+                ObjectId = self.fs.put(data,filename = ntpath.basename(filePath),paper_id = paper_id)
+                #print(ObjectId)
+                #fileObj.close()
+            return ObjectId
+ 
+    def _getID(self,query): #通过文件属性获取文件ID，ID为文件删除、文件读取做准备
+        target = self.db['{}.{}'.format(self.file_table,'files')].find_one(query)
+        if target!=None:
+            return target['_id']
+        else:
+            return None
+ 
+    def getFile(self,paper_id): #获取文件属性，并读出二进制数据至内存
+        id = self._getID({'paper_id':paper_id})
+        if id==None:
+            error_pop_up('No record with paper_id of {}'.format(paper_id),'Error')
+            return None
+        gf = self.fs.get(id)
+        bdata=gf.read() #二进制数据
+        attri={} #文件属性信息
+        attri['chunk_size']=gf.chunk_size
+        attri['length']=gf.length
+        attri["upload_date"] = gf.upload_date
+        attri["filename"] = gf.filename
+        attri['md5']=gf.md5
+        # error_pop_up(str('success to get file with attri of {}'.format(attri)),'Information')
+        return (bdata, attri)
+
+    def write_2_disk(self, paper_id, path = None): #将二进制数据存入磁盘
+        # id = self._getID({'paper_id':paper_id})
+        results = self.getFile(paper_id)
+        if results == None:
+            return
+        bdata, attri = results
+        name = attri['filename']
+        if path!=None:
+            name = os.path.join(path, name)
+        if name:
+            output = open(name, 'wb')
+        output.write(bdata)
+        output.close()
+        # error_pop_up("Success to fetch and save file with filename of {}!".format(name),'Information')
+        return name
+ 
+    def remove(self,paper_id): #文件数据库中数据的删除
+        id = self._getID({'paper_id':paper_id})
+        if id == None:
+            error_pop_up('No record with paper_id of {}'.format(paper_id),'Error')
+            return
+        self.fs.delete(id) #只能是id       
+        # error_pop_up('success to delete the file of id {}'.format(id))
+
 if __name__ == "__main__":
     QApplication.setStyle("windows")
     app = QApplication(sys.argv)
     myWin = MyMainWindow()
-    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     myWin.show()
     sys.exit(app.exec_())

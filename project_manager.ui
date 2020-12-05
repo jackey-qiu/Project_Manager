@@ -227,6 +227,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="pushButton_open_pdf">
+                <property name="text">
+                 <string>OpenPDF</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="pushButton_hide_show">
                 <property name="text">
                  <string>Hide or show query</string>
@@ -348,7 +355,7 @@
                 <item>
                  <widget class="QTabWidget" name="tabWidget_2">
                   <property name="currentIndex">
-                   <number>2</number>
+                   <number>0</number>
                   </property>
                   <widget class="QWidget" name="tab_5">
                    <attribute name="title">
@@ -479,6 +486,16 @@
                         <item row="12" column="1">
                          <widget class="QLineEdit" name="lineEdit_doi"/>
                         </item>
+                        <item row="13" column="0">
+                         <widget class="QLabel" name="label_11">
+                          <property name="text">
+                           <string>PDF</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="13" column="1">
+                         <widget class="QLineEdit" name="lineEdit_pdf"/>
+                        </item>
                        </layout>
                       </widget>
                       <widget class="QTabWidget" name="tabWidget_3">
@@ -570,6 +587,13 @@
                        <widget class="QPushButton" name="pushButton_remove_paper">
                         <property name="text">
                          <string>RemovePaper</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_remove_pdf">
+                        <property name="text">
+                         <string>RemovePDF</string>
                         </property>
                        </widget>
                       </item>
