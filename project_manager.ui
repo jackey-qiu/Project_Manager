@@ -267,351 +267,30 @@
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <layout class="QHBoxLayout" name="horizontalLayout_12">
                 <item>
-                 <widget class="QFrame" name="frame_4">
-                  <property name="maximumSize">
-                   <size>
-                    <width>400</width>
-                    <height>16777215</height>
-                   </size>
+                 <widget class="QSplitter" name="splitter_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_2">
-                   <item>
-                    <layout class="QGridLayout" name="gridLayout">
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label_2">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Papers</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QLabel" name="label_4">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Tags</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QListWidget" name="listWidget_papers">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="font">
-                        <font>
-                         <pointsize>14</pointsize>
-                        </font>
-                       </property>
-                       <property name="selectionMode">
-                        <enum>QAbstractItemView::ExtendedSelection</enum>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QListWidget" name="listWidget_tags">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="font">
-                        <font>
-                         <pointsize>14</pointsize>
-                        </font>
-                       </property>
-                       <property name="selectionMode">
-                        <enum>QAbstractItemView::ExtendedSelection</enum>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QTabWidget" name="tabWidget_2">
-                  <property name="currentIndex">
-                   <number>2</number>
-                  </property>
-                  <widget class="QWidget" name="tab_5">
-                   <attribute name="title">
-                    <string>New_paper</string>
-                   </attribute>
-                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <widget class="QFrame" name="frame_4">
+                   <property name="maximumSize">
+                    <size>
+                     <width>400</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_2">
                     <item>
-                     <widget class="QSplitter" name="splitter_2">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <widget class="QWidget" name="formLayoutWidget_2">
-                       <layout class="QFormLayout" name="formLayout">
-                        <item row="1" column="0">
-                         <widget class="QLabel" name="label_23">
-                          <property name="text">
-                           <string>Basic info</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="0">
-                         <widget class="QLabel" name="label_8">
-                          <property name="text">
-                           <string>First_author</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="1">
-                         <widget class="QLineEdit" name="lineEdit_1st_author"/>
-                        </item>
-                        <item row="3" column="0">
-                         <widget class="QLabel" name="label_26">
-                          <property name="text">
-                           <string>Full_authors</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="3" column="1">
-                         <widget class="QLineEdit" name="lineEdit_full_author"/>
-                        </item>
-                        <item row="4" column="0">
-                         <widget class="QLabel" name="label_27">
-                          <property name="text">
-                           <string>Paper_type</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="4" column="1">
-                         <widget class="QLineEdit" name="lineEdit_paper_type"/>
-                        </item>
-                        <item row="5" column="0">
-                         <widget class="QLabel" name="label_18">
-                          <property name="text">
-                           <string>Journal</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="5" column="1">
-                         <widget class="QLineEdit" name="lineEdit_journal"/>
-                        </item>
-                        <item row="6" column="0">
-                         <widget class="QLabel" name="label_28">
-                          <property name="text">
-                           <string>Volume</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="6" column="1">
-                         <widget class="QLineEdit" name="lineEdit_volume"/>
-                        </item>
-                        <item row="7" column="0">
-                         <widget class="QLabel" name="label_29">
-                          <property name="text">
-                           <string>Issue</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="7" column="1">
-                         <widget class="QLineEdit" name="lineEdit_issue"/>
-                        </item>
-                        <item row="8" column="0">
-                         <widget class="QLabel" name="label_32">
-                          <property name="text">
-                           <string>Page</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="8" column="1">
-                         <widget class="QLineEdit" name="lineEdit_page"/>
-                        </item>
-                        <item row="9" column="0">
-                         <widget class="QLabel" name="label_19">
-                          <property name="text">
-                           <string>Year</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="9" column="1">
-                         <widget class="QLineEdit" name="lineEdit_year"/>
-                        </item>
-                        <item row="10" column="0">
-                         <widget class="QLabel" name="label_20">
-                          <property name="text">
-                           <string>Title</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="10" column="1">
-                         <widget class="QLineEdit" name="lineEdit_title"/>
-                        </item>
-                        <item row="11" column="0">
-                         <widget class="QLabel" name="label_21">
-                          <property name="text">
-                           <string>URL</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="11" column="1">
-                         <widget class="QLineEdit" name="lineEdit_url"/>
-                        </item>
-                        <item row="12" column="0">
-                         <widget class="QLabel" name="label_22">
-                          <property name="text">
-                           <string>DOI</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="12" column="1">
-                         <widget class="QLineEdit" name="lineEdit_doi"/>
-                        </item>
-                        <item row="13" column="0">
-                         <widget class="QLabel" name="label_11">
-                          <property name="text">
-                           <string>PDF</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="13" column="1">
-                         <widget class="QLineEdit" name="lineEdit_pdf"/>
-                        </item>
-                       </layout>
-                      </widget>
-                      <widget class="QTabWidget" name="tabWidget_3">
-                       <property name="currentIndex">
-                        <number>1</number>
-                       </property>
-                       <widget class="QWidget" name="tab_7">
-                        <attribute name="title">
-                         <string>Abstract</string>
-                        </attribute>
-                        <layout class="QHBoxLayout" name="horizontalLayout_16">
-                         <item>
-                          <widget class="QTextEdit" name="textEdit_abstract">
-                           <property name="frameShape">
-                            <enum>QFrame::Box</enum>
-                           </property>
-                           <property name="frameShadow">
-                            <enum>QFrame::Raised</enum>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
-                       </widget>
-                       <widget class="QWidget" name="tab_8">
-                        <attribute name="title">
-                         <string>Graph</string>
-                        </attribute>
-                        <layout class="QVBoxLayout" name="verticalLayout_6">
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_11">
-                           <item>
-                            <widget class="QPushButton" name="pushButton_open_image">
-                             <property name="text">
-                              <string>openImage</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="pushButton_paste_image">
-                             <property name="text">
-                              <string>pasteFromClipboard</string>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <widget class="View" name="widget_view" native="true"/>
-                         </item>
-                        </layout>
-                       </widget>
-                      </widget>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="Line" name="line">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_15">
-                      <item>
-                       <widget class="QLabel" name="label_31">
-                        <property name="text">
-                         <string>PaperList</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBox_papers">
-                        <property name="minimumSize">
-                         <size>
-                          <width>150</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_update_paper">
-                        <property name="text">
-                         <string>UpdatePaper</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_remove_paper">
-                        <property name="text">
-                         <string>RemovePaper</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_remove_pdf">
-                        <property name="text">
-                         <string>RemovePDF</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_2">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_add_new_paper">
+                     <layout class="QGridLayout" name="gridLayout">
+                      <item row="0" column="0">
+                       <widget class="QLabel" name="label_2">
                         <property name="sizePolicy">
                          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                           <horstretch>0</horstretch>
@@ -619,521 +298,845 @@
                          </sizepolicy>
                         </property>
                         <property name="text">
-                         <string>AddNewPaper</string>
+                         <string>Papers</string>
                         </property>
                        </widget>
                       </item>
-                     </layout>
-                    </item>
-                   </layout>
-                  </widget>
-                  <widget class="QWidget" name="tab_3">
-                   <attribute name="title">
-                    <string>New_input</string>
-                   </attribute>
-                   <layout class="QVBoxLayout" name="verticalLayout_13">
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_6">
-                      <item>
-                       <widget class="QLabel" name="label_9">
+                      <item row="0" column="1">
+                       <widget class="QLabel" name="label_4">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
                         <property name="text">
-                         <string>paper_id</string>
+                         <string>Tags</string>
                         </property>
                        </widget>
                       </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBox_paper_ids_new_input"/>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_12">
+                      <item row="1" column="0">
+                       <widget class="QListWidget" name="listWidget_papers">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
-                        <property name="text">
-                         <string>which_section</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBox_section_new_input">
-                        <item>
-                         <property name="text">
-                          <string>questions</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>methods</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>results</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>discussions</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>terminology</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>grammer</string>
-                         </property>
-                        </item>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_10">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>tag_name</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_tag_new_input">
-                        <property name="maximumSize">
-                         <size>
-                          <width>150</width>
-                          <height>16777215</height>
-                         </size>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QCheckBox" name="checkBox_check_tag">
-                        <property name="text">
-                         <string>newtag</string>
-                        </property>
-                        <property name="checked">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QCheckBox" name="checkBox_figure">
-                        <property name="text">
-                         <string>figure</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                    <item>
-                     <widget class="QTabWidget" name="tabWidget_5">
-                      <property name="currentIndex">
-                       <number>1</number>
-                      </property>
-                      <widget class="QWidget" name="tab_11">
-                       <attribute name="title">
-                        <string>tag_content_palin_text</string>
-                       </attribute>
-                       <layout class="QHBoxLayout" name="horizontalLayout_19">
-                        <item>
-                         <widget class="QTextEdit" name="textEdit_tag_content_new_input">
-                          <property name="font">
-                           <font>
-                            <pointsize>14</pointsize>
-                           </font>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                      <widget class="QWidget" name="tab_12">
-                       <attribute name="title">
-                        <string>tag_content_figure</string>
-                       </attribute>
-                       <layout class="QHBoxLayout" name="horizontalLayout_20">
-                        <item>
-                         <widget class="View" name="widget_figure_input" native="true"/>
-                        </item>
-                        <item>
-                         <layout class="QVBoxLayout" name="verticalLayout_3">
-                          <item>
-                           <widget class="QPushButton" name="pushButton_paste_figure">
-                            <property name="sizePolicy">
-                             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                              <horstretch>0</horstretch>
-                              <verstretch>0</verstretch>
-                             </sizepolicy>
-                            </property>
-                            <property name="text">
-                             <string>Paste</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QPushButton" name="pushButton_load_figure">
-                            <property name="sizePolicy">
-                             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                              <horstretch>0</horstretch>
-                              <verstretch>0</verstretch>
-                             </sizepolicy>
-                            </property>
-                            <property name="text">
-                             <string>Load</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <spacer name="verticalSpacer">
-                            <property name="orientation">
-                             <enum>Qt::Vertical</enum>
-                            </property>
-                            <property name="sizeType">
-                             <enum>QSizePolicy::Expanding</enum>
-                            </property>
-                            <property name="sizeHint" stdset="0">
-                             <size>
-                              <width>20</width>
-                              <height>40</height>
-                             </size>
-                            </property>
-                           </spacer>
-                          </item>
-                         </layout>
-                        </item>
-                       </layout>
-                      </widget>
-                     </widget>
-                    </item>
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_8">
-                      <item>
-                       <widget class="QLabel" name="label_25">
-                        <property name="text">
-                         <string>location in paper</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_location_new_input"/>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_append_info_new_input">
-                        <property name="text">
-                         <string>AppendInfo</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                   </layout>
-                  </widget>
-                  <widget class="QWidget" name="tab_4">
-                   <attribute name="title">
-                    <string>Edit_existing</string>
-                   </attribute>
-                   <layout class="QHBoxLayout" name="horizontalLayout_12">
-                    <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_4">
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_7">
-                        <item>
-                         <widget class="QLabel" name="label_14">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="text">
-                           <string>paper_id</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="comboBox_paper_ids"/>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_15">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="text">
-                           <string>which_section</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="comboBox_section">
-                          <item>
-                           <property name="text">
-                            <string>questions</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>methods</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>results</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>discussions</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>terminology</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>grammer</string>
-                           </property>
-                          </item>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_16">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="text">
-                           <string>tag_name</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="comboBox_tag_list"/>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_17">
-                        <property name="text">
-                         <string>tag_content</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QTextEdit" name="textEdit_tag_conent">
                         <property name="font">
                          <font>
                           <pointsize>14</pointsize>
                          </font>
                         </property>
+                        <property name="selectionMode">
+                         <enum>QAbstractItemView::ExtendedSelection</enum>
+                        </property>
                        </widget>
                       </item>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_10">
-                        <item>
-                         <widget class="QLabel" name="label_34">
-                          <property name="text">
-                           <string>Location in paper</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLineEdit" name="lineEdit_location"/>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_update_info">
-                          <property name="text">
-                           <string>UpdateInfo</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_delete_tag">
-                          <property name="text">
-                           <string>DeleteTag</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
+                      <item row="1" column="1">
+                       <widget class="QListWidget" name="listWidget_tags">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>14</pointsize>
+                         </font>
+                        </property>
+                        <property name="selectionMode">
+                         <enum>QAbstractItemView::ExtendedSelection</enum>
+                        </property>
+                       </widget>
                       </item>
                      </layout>
                     </item>
                    </layout>
                   </widget>
-                  <widget class="QWidget" name="tab_6">
-                   <attribute name="title">
-                    <string>Tag_info</string>
-                   </attribute>
-                   <layout class="QVBoxLayout" name="verticalLayout_7">
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_4">
-                      <item>
-                       <widget class="QLabel" name="label_24">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>Which Section</string>
-                        </property>
+                  <widget class="QTabWidget" name="tabWidget_2">
+                   <property name="currentIndex">
+                    <number>0</number>
+                   </property>
+                   <widget class="QWidget" name="tab_5">
+                    <attribute name="title">
+                     <string>New_paper</string>
+                    </attribute>
+                    <layout class="QVBoxLayout" name="verticalLayout_8">
+                     <item>
+                      <widget class="QSplitter" name="splitter_2">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <widget class="QWidget" name="formLayoutWidget_2">
+                        <layout class="QFormLayout" name="formLayout">
+                         <item row="1" column="0">
+                          <widget class="QLabel" name="label_23">
+                           <property name="text">
+                            <string>Basic info</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="0">
+                          <widget class="QLabel" name="label_8">
+                           <property name="text">
+                            <string>First_author</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QLineEdit" name="lineEdit_1st_author"/>
+                         </item>
+                         <item row="3" column="0">
+                          <widget class="QLabel" name="label_26">
+                           <property name="text">
+                            <string>Full_authors</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="1">
+                          <widget class="QLineEdit" name="lineEdit_full_author"/>
+                         </item>
+                         <item row="4" column="0">
+                          <widget class="QLabel" name="label_27">
+                           <property name="text">
+                            <string>Paper_type</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="4" column="1">
+                          <widget class="QLineEdit" name="lineEdit_paper_type"/>
+                         </item>
+                         <item row="5" column="0">
+                          <widget class="QLabel" name="label_18">
+                           <property name="text">
+                            <string>Journal</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="5" column="1">
+                          <widget class="QLineEdit" name="lineEdit_journal"/>
+                         </item>
+                         <item row="6" column="0">
+                          <widget class="QLabel" name="label_28">
+                           <property name="text">
+                            <string>Volume</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="6" column="1">
+                          <widget class="QLineEdit" name="lineEdit_volume"/>
+                         </item>
+                         <item row="7" column="0">
+                          <widget class="QLabel" name="label_29">
+                           <property name="text">
+                            <string>Issue</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="7" column="1">
+                          <widget class="QLineEdit" name="lineEdit_issue"/>
+                         </item>
+                         <item row="8" column="0">
+                          <widget class="QLabel" name="label_32">
+                           <property name="text">
+                            <string>Page</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="8" column="1">
+                          <widget class="QLineEdit" name="lineEdit_page"/>
+                         </item>
+                         <item row="9" column="0">
+                          <widget class="QLabel" name="label_19">
+                           <property name="text">
+                            <string>Year</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="9" column="1">
+                          <widget class="QLineEdit" name="lineEdit_year"/>
+                         </item>
+                         <item row="10" column="0">
+                          <widget class="QLabel" name="label_20">
+                           <property name="text">
+                            <string>Title</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="10" column="1">
+                          <widget class="QLineEdit" name="lineEdit_title"/>
+                         </item>
+                         <item row="11" column="0">
+                          <widget class="QLabel" name="label_21">
+                           <property name="text">
+                            <string>URL</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="11" column="1">
+                          <widget class="QLineEdit" name="lineEdit_url"/>
+                         </item>
+                         <item row="12" column="0">
+                          <widget class="QLabel" name="label_22">
+                           <property name="text">
+                            <string>DOI</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="12" column="1">
+                          <widget class="QLineEdit" name="lineEdit_doi"/>
+                         </item>
+                         <item row="13" column="0">
+                          <widget class="QLabel" name="label_11">
+                           <property name="text">
+                            <string>PDF</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="13" column="1">
+                          <widget class="QLineEdit" name="lineEdit_pdf"/>
+                         </item>
+                        </layout>
                        </widget>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBox_section_tag_info">
-                        <item>
+                       <widget class="QTabWidget" name="tabWidget_3">
+                        <property name="currentIndex">
+                         <number>1</number>
+                        </property>
+                        <widget class="QWidget" name="tab_7">
+                         <attribute name="title">
+                          <string>Abstract</string>
+                         </attribute>
+                         <layout class="QHBoxLayout" name="horizontalLayout_16">
+                          <item>
+                           <widget class="QTextEdit" name="textEdit_abstract">
+                            <property name="frameShape">
+                             <enum>QFrame::Box</enum>
+                            </property>
+                            <property name="frameShadow">
+                             <enum>QFrame::Raised</enum>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                        <widget class="QWidget" name="tab_8">
+                         <attribute name="title">
+                          <string>Graph</string>
+                         </attribute>
+                         <layout class="QVBoxLayout" name="verticalLayout_6">
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_11">
+                            <item>
+                             <widget class="QPushButton" name="pushButton_open_image">
+                              <property name="text">
+                               <string>openImage</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QPushButton" name="pushButton_paste_image">
+                              <property name="text">
+                               <string>pasteFromClipboard</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </item>
+                          <item>
+                           <widget class="View" name="widget_view" native="true"/>
+                          </item>
+                         </layout>
+                        </widget>
+                       </widget>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="Line" name="line">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_15">
+                       <item>
+                        <widget class="QLabel" name="label_31">
                          <property name="text">
-                          <string>questions</string>
+                          <string>PaperList</string>
                          </property>
-                        </item>
-                        <item>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_papers">
+                         <property name="minimumSize">
+                          <size>
+                           <width>150</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_update_paper">
                          <property name="text">
-                          <string>methods</string>
+                          <string>UpdatePaper</string>
                          </property>
-                        </item>
-                        <item>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_remove_paper">
                          <property name="text">
-                          <string>results</string>
+                          <string>RemovePaper</string>
                          </property>
-                        </item>
-                        <item>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_remove_pdf">
                          <property name="text">
-                          <string>discussions</string>
+                          <string>RemovePDF</string>
                          </property>
-                        </item>
-                        <item>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_2">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_add_new_paper">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
                          <property name="text">
-                          <string>terminology</string>
+                          <string>AddNewPaper</string>
                          </property>
-                        </item>
-                        <item>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="tab_3">
+                    <attribute name="title">
+                     <string>New_input</string>
+                    </attribute>
+                    <layout class="QVBoxLayout" name="verticalLayout_13">
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_6">
+                       <item>
+                        <widget class="QLabel" name="label_9">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
                          <property name="text">
-                          <string>grammer</string>
+                          <string>paper_id</string>
                          </property>
-                        </item>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_paper_ids_new_input"/>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="label_12">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>which_section</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_section_new_input">
+                         <item>
+                          <property name="text">
+                           <string>questions</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>methods</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>results</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>discussions</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>terminology</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>grammer</string>
+                          </property>
+                         </item>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="label_10">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>tag_name</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="lineEdit_tag_new_input">
+                         <property name="maximumSize">
+                          <size>
+                           <width>150</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QCheckBox" name="checkBox_check_tag">
+                         <property name="text">
+                          <string>newtag</string>
+                         </property>
+                         <property name="checked">
+                          <bool>true</bool>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QCheckBox" name="checkBox_figure">
+                         <property name="text">
+                          <string>figure</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QTabWidget" name="tabWidget_5">
+                       <property name="currentIndex">
+                        <number>1</number>
+                       </property>
+                       <widget class="QWidget" name="tab_11">
+                        <attribute name="title">
+                         <string>tag_content_palin_text</string>
+                        </attribute>
+                        <layout class="QHBoxLayout" name="horizontalLayout_19">
+                         <item>
+                          <widget class="QTextEdit" name="textEdit_tag_content_new_input">
+                           <property name="font">
+                            <font>
+                             <pointsize>14</pointsize>
+                            </font>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
                        </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_7">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>Which Tag</string>
-                        </property>
+                       <widget class="QWidget" name="tab_12">
+                        <attribute name="title">
+                         <string>tag_content_figure</string>
+                        </attribute>
+                        <layout class="QHBoxLayout" name="horizontalLayout_20">
+                         <item>
+                          <widget class="View" name="widget_figure_input" native="true"/>
+                         </item>
+                         <item>
+                          <layout class="QVBoxLayout" name="verticalLayout_3">
+                           <item>
+                            <widget class="QPushButton" name="pushButton_paste_figure">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <property name="text">
+                              <string>Paste</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="pushButton_load_figure">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <property name="text">
+                              <string>Load</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <spacer name="verticalSpacer">
+                             <property name="orientation">
+                              <enum>Qt::Vertical</enum>
+                             </property>
+                             <property name="sizeType">
+                              <enum>QSizePolicy::Expanding</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                              <size>
+                               <width>20</width>
+                               <height>40</height>
+                              </size>
+                             </property>
+                            </spacer>
+                           </item>
+                          </layout>
+                         </item>
+                        </layout>
                        </widget>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBox_tags">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>120</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_33">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>Rename to</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_renamed_tag"/>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_rename">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>Rename</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_5">
-                      <property name="text">
-                       <string>tag info</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QTextEdit" name="textEdit_tag_info">
-                      <property name="font">
-                       <font>
-                        <pointsize>14</pointsize>
-                       </font>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_17">
-                      <item>
-                       <widget class="QPushButton" name="pushButton_update_tag_info">
-                        <property name="text">
-                         <string>UpdateTagInfo</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_6">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </item>
-                   </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_8">
+                       <item>
+                        <widget class="QLabel" name="label_25">
+                         <property name="text">
+                          <string>location in paper</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="lineEdit_location_new_input"/>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_append_info_new_input">
+                         <property name="text">
+                          <string>AppendInfo</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="tab_4">
+                    <attribute name="title">
+                     <string>Edit_existing</string>
+                    </attribute>
+                    <layout class="QVBoxLayout" name="verticalLayout_10">
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_4">
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_7">
+                         <item>
+                          <widget class="QLabel" name="label_14">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="text">
+                            <string>paper_id</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QComboBox" name="comboBox_paper_ids"/>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="label_15">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="text">
+                            <string>which_section</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QComboBox" name="comboBox_section">
+                           <item>
+                            <property name="text">
+                             <string>questions</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>methods</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>results</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>discussions</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>terminology</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>grammer</string>
+                            </property>
+                           </item>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="label_16">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="text">
+                            <string>tag_name</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QComboBox" name="comboBox_tag_list"/>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="label_17">
+                         <property name="text">
+                          <string>tag_content</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QTextEdit" name="textEdit_tag_conent">
+                         <property name="font">
+                          <font>
+                           <pointsize>14</pointsize>
+                          </font>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_10">
+                         <item>
+                          <widget class="QLabel" name="label_34">
+                           <property name="text">
+                            <string>Location in paper</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLineEdit" name="lineEdit_location"/>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="pushButton_update_info">
+                           <property name="text">
+                            <string>UpdateInfo</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="pushButton_delete_tag">
+                           <property name="text">
+                            <string>DeleteTag</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="tab_6">
+                    <attribute name="title">
+                     <string>Tag_info</string>
+                    </attribute>
+                    <layout class="QVBoxLayout" name="verticalLayout_7">
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_4">
+                       <item>
+                        <widget class="QLabel" name="label_24">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Which Section</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_section_tag_info">
+                         <item>
+                          <property name="text">
+                           <string>questions</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>methods</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>results</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>discussions</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>terminology</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>grammer</string>
+                          </property>
+                         </item>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="label_7">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Which Tag</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_tags">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>120</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="label_33">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Rename to</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="lineEdit_renamed_tag"/>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_rename">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Rename</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_5">
+                       <property name="text">
+                        <string>tag info</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QTextEdit" name="textEdit_tag_info">
+                       <property name="font">
+                        <font>
+                         <pointsize>14</pointsize>
+                        </font>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_17">
+                       <item>
+                        <widget class="QPushButton" name="pushButton_update_tag_info">
+                         <property name="text">
+                          <string>UpdateTagInfo</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_6">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
                   </widget>
                  </widget>
                 </item>
@@ -1234,14 +1237,14 @@ sentence_structure:sentence_structure
                          </item>
                          <item>
                           <layout class="QFormLayout" name="formLayout_2">
-                           <item row="0" column="0">
+                           <item row="1" column="0">
                             <widget class="QLabel" name="label_30">
                              <property name="text">
                               <string>paper_id</string>
                              </property>
                             </widget>
                            </item>
-                           <item row="0" column="1">
+                           <item row="1" column="1">
                             <widget class="QLineEdit" name="lineEdit_paper_id_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1257,14 +1260,14 @@ sentence_structure:sentence_structure
                              </property>
                             </widget>
                            </item>
-                           <item row="1" column="0">
+                           <item row="2" column="0">
                             <widget class="QLabel" name="label_35">
                              <property name="text">
                               <string>section</string>
                              </property>
                             </widget>
                            </item>
-                           <item row="1" column="1">
+                           <item row="2" column="1">
                             <widget class="QComboBox" name="comboBox_section_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1316,14 +1319,14 @@ sentence_structure:sentence_structure
                              </item>
                             </widget>
                            </item>
-                           <item row="2" column="0">
+                           <item row="3" column="0">
                             <widget class="QLabel" name="label_36">
                              <property name="text">
                               <string>tag_name</string>
                              </property>
                             </widget>
                            </item>
-                           <item row="2" column="1">
+                           <item row="3" column="1">
                             <widget class="QLineEdit" name="lineEdit_tag_name_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1339,7 +1342,36 @@ sentence_structure:sentence_structure
                              </property>
                             </widget>
                            </item>
-                           <item row="3" column="1">
+                           <item row="0" column="0">
+                            <widget class="QLabel" name="label_38">
+                             <property name="text">
+                              <string>pick_paper</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="0" column="1">
+                            <widget class="QComboBox" name="comboBox_pick_paper">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <property name="minimumSize">
+                              <size>
+                               <width>120</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                             <property name="maximumSize">
+                              <size>
+                               <width>120</width>
+                               <height>16777215</height>
+                              </size>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="4" column="0">
                             <widget class="QPushButton" name="pushButton_extract_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1354,7 +1386,20 @@ sentence_structure:sentence_structure
                               </size>
                              </property>
                              <property name="text">
-                              <string>Extract Figure</string>
+                              <string>Extract</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="4" column="1">
+                            <widget class="QPushButton" name="pushButton_save_figure">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <property name="text">
+                              <string>Save</string>
                              </property>
                             </widget>
                            </item>

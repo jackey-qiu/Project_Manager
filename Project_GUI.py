@@ -86,6 +86,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
+        self.listWidget_papers.itemDoubleClicked.connect(lambda:self.comboBox_papers.setCurrentText(self.listWidget_papers.selectedItems()[0].text()))
         self.pushButton_add_new_paper.clicked.connect(self.add_paper_info)
         self.comboBox_tags.currentIndexChanged.connect(self.display_tag_info)
         self.comboBox_section_tag_info.currentIndexChanged.connect(self.update_tag_list_in_combo)
@@ -97,6 +98,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
         self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
+        self.comboBox_pick_paper.currentIndexChanged.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
         self.pushButton_update_paper.clicked.connect(self.update_paper_info)
         self.pushButton_remove_paper.clicked.connect(self.delete_one_paper)
         self.pushButton_rename.clicked.connect(self.rename_tag)
@@ -106,6 +108,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_paste_figure.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_load_figure.clicked.connect(lambda:self.open_image_file(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
+        self.pushButton_save_figure.clicked.connect(self.save_figure_to_filesystem)
         self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
         self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
         self.pushButton_delete_tag.clicked.connect(self.delete_tag)
@@ -174,6 +177,26 @@ class MyMainWindow(QMainWindow):
             self.widget_figure_existing.show()
         except Exception as e:
             error_pop_up('Fail to load figure from database,\n{}'.format(str(e)),'Error')
+
+    def save_figure_to_filesystem(self):
+        paper_id = self.lineEdit_paper_id_figure.text()
+        section = self.comboBox_section_figure.currentText()
+        tag_name = self.lineEdit_tag_name_figure.text()
+        target = self.database[section].find_one({"$and":[{'paper_id':paper_id},{'tag_name':tag_name}]})
+        tag_contents = target['tag_content']
+        try:
+            figures_strings = [base64.decodebytes(each) for each in tag_contents if type(each)==type(b'')]
+            if len(figures_strings)!=0:
+                options = QFileDialog.Options()
+                options |= QFileDialog.DontUseNativeDialog
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save file as", "", "image file (*.png);;all files (*.*)")
+                if fileName:
+                    for i, each in enumerate(figures_strings):
+                        with open(fileName.replace('.','_{}.'.format(i+1)), "wb") as fh:
+                            fh.write(each)
+                    self.statusbar.showMessage('The figure was saved on local disk successfully!')
+        except Exception as e:
+            error_pop_up('Fail to save figure to filesystem,\n{}'.format(str(e)),'Error')
 
     def connect_mongo_server(self):
         #local server connection
@@ -277,6 +300,8 @@ class MyMainWindow(QMainWindow):
         self.comboBox_paper_ids.addItems(papers)
         self.comboBox_papers.clear()
         self.comboBox_papers.addItems(papers)
+        self.comboBox_pick_paper.clear()
+        self.comboBox_pick_paper.addItems(papers)
 
     def rename_tag(self):
         new_tag_name = self.lineEdit_renamed_tag.text()
