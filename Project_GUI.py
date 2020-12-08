@@ -95,6 +95,8 @@ class MyMainWindow(QMainWindow):
         self.comboBox_tag_list.currentIndexChanged.connect(self.extract_tag_contents_slot)
         self.pushButton_update_info.clicked.connect(self.update_tag_contents_slot)
         self.comboBox_section.currentIndexChanged.connect(self.update_tag_list_in_existing_input)
+        self.comboBox_section_new_input.currentIndexChanged.connect(self.update_tag_list_in_new_input)
+        self.comboBox_tag_list_new_input.currentIndexChanged.connect(self.update_tag_in_new_input)
         self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
         self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
@@ -377,6 +379,17 @@ class MyMainWindow(QMainWindow):
         tag_list = self.get_tag_list_by_paper_id_and_collection_name(paper_id, collection)
         self.comboBox_tag_list.clear()
         self.comboBox_tag_list.addItems(tag_list)
+
+    def update_tag_list_in_new_input(self):
+        collection = self.comboBox_section_new_input.currentText()
+        paper_id = self.comboBox_paper_ids_new_input.currentText()
+        tag_list = self.get_tag_list_by_paper_id_and_collection_name(paper_id, collection)
+        self.comboBox_tag_list_new_input.clear()
+        self.comboBox_tag_list_new_input.addItems(tag_list)
+
+    def update_tag_in_new_input(self):
+        self.checkBox_check_tag.setChecked(False)
+        self.lineEdit_tag_new_input.setText(self.comboBox_tag_list_new_input.currentText())
 
     def get_tag_list_by_paper_id_and_collection_name(self,paper_id,collection_name):
         tag_list = [each['tag_name'] for each in self.database[collection_name].find({'paper_id':paper_id})]
