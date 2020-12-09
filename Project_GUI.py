@@ -83,24 +83,25 @@ class MyMainWindow(QMainWindow):
         self.pushButton_start_server.clicked.connect(self.connect_mongo_server)
         self.pushButton_stop_server.clicked.connect(self.stop_mongo_server)
         self.pushButton_start_client.clicked.connect(self.start_mongo_client)
+        self.pushButton_remote_client.clicked.connect(self.start_mongo_client_cloud)
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
         self.listWidget_papers.itemDoubleClicked.connect(lambda:self.comboBox_papers.setCurrentText(self.listWidget_papers.selectedItems()[0].text()))
         self.pushButton_add_new_paper.clicked.connect(self.add_paper_info)
-        self.comboBox_tags.currentIndexChanged.connect(self.display_tag_info)
-        self.comboBox_section_tag_info.currentIndexChanged.connect(self.update_tag_list_in_combo)
+        self.comboBox_tags.activated.connect(self.display_tag_info)
+        self.comboBox_section_tag_info.activated.connect(self.update_tag_list_in_combo)
         self.pushButton_update_tag_info.clicked.connect(self.update_tag_info_slot)
         self.pushButton_append_info_new_input.clicked.connect(self.append_new_input)
-        self.comboBox_tag_list.currentIndexChanged.connect(self.extract_tag_contents_slot)
+        self.comboBox_tag_list.activated.connect(self.extract_tag_contents_slot)
         self.pushButton_update_info.clicked.connect(self.update_tag_contents_slot)
-        self.comboBox_section.currentIndexChanged.connect(self.update_tag_list_in_existing_input)
-        self.comboBox_section_new_input.currentIndexChanged.connect(self.update_tag_list_in_new_input)
-        self.comboBox_tag_list_new_input.currentIndexChanged.connect(self.update_tag_in_new_input)
+        self.comboBox_section.activated.connect(self.update_tag_list_in_existing_input)
+        self.comboBox_section_new_input.activated.connect(self.update_tag_list_in_new_input)
+        self.comboBox_tag_list_new_input.activated.connect(self.update_tag_in_new_input)
         self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
-        self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
-        self.comboBox_pick_paper.currentIndexChanged.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
+        self.comboBox_papers.activated.connect(self.extract_paper_info)
+        self.comboBox_pick_paper.activated.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
         self.pushButton_update_paper.clicked.connect(self.update_paper_info)
         self.pushButton_remove_paper.clicked.connect(self.delete_one_paper)
         self.pushButton_rename.clicked.connect(self.rename_tag)
@@ -114,6 +115,18 @@ class MyMainWindow(QMainWindow):
         self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
         self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
         self.pushButton_delete_tag.clicked.connect(self.delete_tag)
+        self.pushButton_db_info.clicked.connect(self.get_database_info)
+
+    #get the info of basic setting of mongodb, e.g. locatin of database storage, config file 
+    def get_database_info(self):
+        if hasattr(self, 'mongo_client'):
+            return_str = self.mongo_client.admin.command((({'getCmdLineOpts': 1})))
+            return_str_list = []
+            for key, item in return_str.items():
+                return_str_list.append('{}:{}'.format(key,item))
+            error_pop_up('\n'.join(return_str_list),'Information')
+        else:
+            pass
 
     def open_image_file(self, widget_view, base64_string = 'base64_string_temp'):
         self.action.setView(widget_view)
@@ -218,6 +231,14 @@ class MyMainWindow(QMainWindow):
     def start_mongo_client(self):
         try:
             self.mongo_client = MongoClient('localhost:27017')
+            self.comboBox_project_list.clear()
+            self.comboBox_project_list.addItems(self.get_database_in_a_list())
+        except Exception as e:
+            error_pop_up('Fail to start mongo client.'+'\n{}'.format(str(e)),'Error')
+
+    def start_mongo_client_cloud(self):
+        try:
+            self.mongo_client = MongoClient('mongodb+srv://jackey:Qiu112439@cluster0.sjw9m.mongodb.net/<dbname>?retryWrites=true&w=majority')
             self.comboBox_project_list.clear()
             self.comboBox_project_list.addItems(self.get_database_in_a_list())
         except Exception as e:
@@ -388,7 +409,7 @@ class MyMainWindow(QMainWindow):
         self.comboBox_tag_list_new_input.addItems(tag_list)
 
     def update_tag_in_new_input(self):
-        self.checkBox_check_tag.setChecked(False)
+        # self.checkBox_check_tag.setChecked(False)
         self.lineEdit_tag_new_input.setText(self.comboBox_tag_list_new_input.currentText())
 
     def get_tag_list_by_paper_id_and_collection_name(self,paper_id,collection_name):
@@ -469,10 +490,12 @@ class MyMainWindow(QMainWindow):
         tag_name = self.lineEdit_tag_new_input.text()
         tag_content = self.textEdit_tag_content_new_input.toPlainText()
         location = self.lineEdit_location_new_input.text()
+        '''
         if self.checkBox_check_tag.isChecked():
-            if tag_name in self.get_tags_in_a_list():
+            if tag_name in self.get_tag_list_by_paper_id_and_collection_name(paper_id, collection): #self.get_tags_in_a_list():
                 error_pop_up('This is supposed to be a new tag, but the tag you provided is already existed. \nPick a different one please! If it is supposed to be an existed tag, check off the newtag checkbox! And do again!','Error')
                 return
+        '''
         if self.checkBox_figure.isChecked():
             if self.base64_string_new_input_temp == '':
                 error_pop_up('This is supposed to be a figure tag, please load a figure or paste a figure first!','Error')
@@ -481,16 +504,21 @@ class MyMainWindow(QMainWindow):
                 #set tag_content to the figure string
                 tag_content = self.base64_string_new_input_temp
         if collection in self.database.list_collection_names():
-            if self.database[collection].find_one({'tag_name':tag_name})==None:
+            if self.database[collection].find_one({'$and':[{'tag_name':tag_name},{'paper_id':paper_id}]})==None:
                 self.database[collection].insert_one({'paper_id':paper_id,'tag_name':tag_name,'tag_content':[tag_content],'location':[location]})
-                # self.update_tag_info(tag_name,'To be edited!',collection, force = False)
+                self.statusbar.clearMessage()
+                self.statusbar.showMessage('New tag content of tag_name {} is inserted!'.format(tag_name))
             else:
-                newvalues_tag_content = { "$set": { "tag_content": self.database[collection].find_one({'tag_name':tag_name})['tag_content']+[tag_content]}}
-                newvalues_tag_location = { "$set": { "location": self.database[collection].find_one({'tag_name':tag_name})['location']+[location]}}
-                self.database[collection].update_one({'tag_name':tag_name},newvalues_tag_content)
-                self.database[collection].update_one({'tag_name':tag_name},newvalues_tag_location)
+                newvalues_tag_content = { "$set": { "tag_content": self.database[collection].find_one({'$and':[{'tag_name':tag_name},{'paper_id':paper_id}]})['tag_content']+[tag_content]}}
+                newvalues_tag_location = { "$set": { "location": self.database[collection].find_one({'$and':[{'tag_name':tag_name},{'paper_id':paper_id}]})['location']+[location]}}
+                self.database[collection].update_one({'$and':[{'tag_name':tag_name},{'paper_id':paper_id}]},newvalues_tag_content)
+                self.database[collection].update_one({'$and':[{'tag_name':tag_name},{'paper_id':paper_id}]},newvalues_tag_location)
+                self.statusbar.clearMessage()
+                self.statusbar.showMessage('New tag content of tag_name {} is appended!'.format(tag_name))
         else:
             self.database[collection].insert_one({'paper_id':paper_id,'tag_name':tag_name,'tag_content':[tag_content],'location':[location]})
+            self.statusbar.clearMessage()
+            self.statusbar.showMessage('New tag content of tag_name {} is inserted!'.format(tag_name))
         if self.database.tag_info.find_one({'tag_name':tag_name})==None:
             self.update_tag_info(tag_name,'To be edited!',collection, force = False)
             self.update_tag_list_in_listwidget()
@@ -530,6 +558,8 @@ class MyMainWindow(QMainWindow):
                     pass
                 else:
                     item('')
+        if not hasattr(self,'file_worker'):
+            return
         pdf = self.file_worker._getID(query = {'paper_id':paper_id})
         if pdf!=None:
             self.lineEdit_pdf.setText(str(pdf))

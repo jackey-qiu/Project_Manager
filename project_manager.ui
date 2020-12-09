@@ -51,14 +51,45 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_start_client">
+           <widget class="QPushButton" name="pushButton_db_info">
             <property name="text">
-             <string>Start Client</string>
+             <string>DatabaseInfo</string>
             </property>
            </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_24">
+          <item>
+           <widget class="QPushButton" name="pushButton_start_client">
+            <property name="text">
+             <string>Start Local Client</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_remote_client">
+            <property name="text">
+             <string>Start Remote Client</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_8">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -203,7 +234,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -357,11 +388,11 @@
                   </widget>
                   <widget class="QTabWidget" name="tabWidget_2">
                    <property name="currentIndex">
-                    <number>1</number>
+                    <number>0</number>
                    </property>
                    <widget class="QWidget" name="tab_5">
                     <attribute name="title">
-                     <string>New_paper</string>
+                     <string>Paper_info</string>
                     </attribute>
                     <layout class="QVBoxLayout" name="verticalLayout_8">
                      <item>
@@ -502,7 +533,7 @@
                        </widget>
                        <widget class="QTabWidget" name="tabWidget_3">
                         <property name="currentIndex">
-                         <number>1</number>
+                         <number>0</number>
                         </property>
                         <widget class="QWidget" name="tab_7">
                          <attribute name="title">
@@ -516,6 +547,9 @@
                             </property>
                             <property name="frameShadow">
                              <enum>QFrame::Raised</enum>
+                            </property>
+                            <property name="acceptRichText">
+                             <bool>false</bool>
                             </property>
                            </widget>
                           </item>
@@ -745,16 +779,6 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QCheckBox" name="checkBox_check_tag">
-                         <property name="text">
-                          <string>newtag</string>
-                         </property>
-                         <property name="checked">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
                         <widget class="QCheckBox" name="checkBox_figure">
                          <property name="text">
                           <string>figure</string>
@@ -766,7 +790,7 @@
                      <item>
                       <widget class="QTabWidget" name="tabWidget_5">
                        <property name="currentIndex">
-                        <number>1</number>
+                        <number>0</number>
                        </property>
                        <widget class="QWidget" name="tab_11">
                         <attribute name="title">
@@ -779,6 +803,9 @@
                             <font>
                              <pointsize>14</pointsize>
                             </font>
+                           </property>
+                           <property name="acceptRichText">
+                            <bool>false</bool>
                            </property>
                           </widget>
                          </item>
@@ -969,6 +996,9 @@
                            <pointsize>14</pointsize>
                           </font>
                          </property>
+                         <property name="acceptRichText">
+                          <bool>false</bool>
+                         </property>
                         </widget>
                        </item>
                        <item>
@@ -1130,6 +1160,9 @@
                         <font>
                          <pointsize>14</pointsize>
                         </font>
+                       </property>
+                       <property name="acceptRichText">
+                        <bool>false</bool>
                        </property>
                       </widget>
                      </item>
