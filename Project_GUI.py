@@ -79,11 +79,24 @@ class MyMainWindow(QMainWindow):
         fileMenu.addAction(self.action.zoom_out)
         fileMenu.addAction(self.action.next_page)
         fileMenu.addAction(self.action.previous_page)
+        self.actionFitWidth.triggered.connect(lambda:self.action.fit_width.trigger())
+        self.actionFitHeight.triggered.connect(lambda:self.action.fit_height.trigger())
+        self.actionFitBoth.triggered.connect(lambda:self.action.fit_both.trigger())
+        self.actionzoomin.triggered.connect(lambda:self.action.zoom_in.trigger())
+        self.actionzoomout.triggered.connect(lambda:self.action.zoom_out.trigger())
+        self.actionExportBiTex.triggered.connect(self.export_bibtex)
+        self.actionImportBiTex.triggered.connect(self.import_bibtex)
+        self.actionDatabaseInfo.triggered.connect(self.get_database_info)
+        self.actionDatabaseCloud.triggered.connect(self.start_mongo_client_cloud)
+        self.actionLocalServerOn.triggered.connect(self.connect_mongo_server)
+        self.actionLocalServerOff.triggered.connect(self.stop_mongo_server)
+        self.actionLocalClient.triggered.connect(self.start_mongo_client)
+
         self.widget_terminal.update_name_space('main_gui',self)
-        self.pushButton_start_server.clicked.connect(self.connect_mongo_server)
-        self.pushButton_stop_server.clicked.connect(self.stop_mongo_server)
-        self.pushButton_start_client.clicked.connect(self.start_mongo_client)
-        self.pushButton_remote_client.clicked.connect(self.start_mongo_client_cloud)
+        # self.pushButton_start_server.clicked.connect(self.connect_mongo_server)
+        # self.pushButton_stop_server.clicked.connect(self.stop_mongo_server)
+        # self.pushButton_start_client.clicked.connect(self.start_mongo_client)
+        # self.pushButton_remote_client.clicked.connect(self.start_mongo_client_cloud)
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
@@ -115,7 +128,13 @@ class MyMainWindow(QMainWindow):
         self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
         self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
         self.pushButton_delete_tag.clicked.connect(self.delete_tag)
-        self.pushButton_db_info.clicked.connect(self.get_database_info)
+        # self.pushButton_db_info.clicked.connect(self.get_database_info)
+
+    def export_bibtex(self):
+        pass
+
+    def import_bibtex(self):
+        pass
 
     #get the info of basic setting of mongodb, e.g. locatin of database storage, config file 
     def get_database_info(self):
