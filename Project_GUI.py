@@ -1,5 +1,7 @@
 import sys,os,qdarkstyle
 import ntpath
+import bibtexparser
+import clipboard
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QMenu
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
@@ -101,7 +103,8 @@ class MyMainWindow(QMainWindow):
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
         self.listWidget_papers.itemDoubleClicked.connect(lambda:self.comboBox_papers.setCurrentText(self.listWidget_papers.selectedItems()[0].text()))
-        self.pushButton_add_new_paper.clicked.connect(self.add_paper_info)
+        self.pushButton_add_new_paper.clicked.connect(lambda:self.add_paper_info(parser=None))
+        self.pushButton_add_paper_clipboard.clicked.connect(self.fill_input_fields_from_clipboard_buffer)
         self.comboBox_tags.activated.connect(self.display_tag_info)
         self.comboBox_section_tag_info.activated.connect(self.update_tag_list_in_combo)
         self.pushButton_update_tag_info.clicked.connect(self.update_tag_info_slot)
@@ -653,8 +656,33 @@ class MyMainWindow(QMainWindow):
         except Exception as e:
             error_pop_up('Fail to update the paper info :-(\n{}'.format(str(e)),'Error')
 
+    def fill_input_fields_from_clipboard_buffer(self):
+        bib_database = bibtexparser.loads(clipboard.paste())
+        if len(bib_database.entries)==0:
+            return
+        record_list = bib_database.get_entry_list()
+        for each_record in record_list:
+            paper_info = {'first_author':'',
+                        'full_authors':each_record.get('author','Author'),
+                        'paper_type':each_record.get('ENTRYTYPE','research article'),
+                        'journal':each_record.get('journal',''),
+                        'volume':each_record.get('volume',''),
+                        'issue':each_record.get('number',''),
+                        'page':each_record.get('pages',''),
+                        'year':each_record.get('year',''),
+                        'title':each_record.get('title',''),
+                        'url':each_record.get('url',''),
+                        'doi':each_record.get('doi',''),
+                        'abstract':each_record.get('abstract',''),
+                        'graphical_abstract':image_to_64base_string(os.path.join(script_path,'icons','no_graphical_abstract.png'))
+                        }
+            paper_info['first_author'] = paper_info['full_authors'].rstrip().rsplit(',')[0]
+            #remove space in url link
+            paper_info['url'] = paper_info['url'].rstrip().replace('\n','').replace(' ','')
+            self.add_paper_info(parser = paper_info)
+
     #create a new paper record in database
-    def add_paper_info(self):
+    def add_paper_info(self, parser = None):
         paper_info = {'first_author':self.lineEdit_1st_author.text(),
                       'full_authors':self.lineEdit_full_author.text(),
                       'paper_type':self.lineEdit_paper_type.text(),
@@ -669,6 +697,8 @@ class MyMainWindow(QMainWindow):
                       'abstract':self.textEdit_abstract.toPlainText().replace('\n',' '),
                       'graphical_abstract':self.base64_string_temp
                       }
+        if parser!=None:
+            paper_info = parser
         paper_id_temp = paper_info['first_author']+'_'+paper_info['year']+'_'
         papers = self.get_papers_in_a_list()
         i = 1
@@ -686,9 +716,12 @@ class MyMainWindow(QMainWindow):
             self.statusbar.clearMessage()
             self.statusbar.showMessage('Append the paper info sucessfully!')
             #also store the pdf file
-            if os.path.exists(self.lineEdit_pdf.text()):
-                self.file_worker.insertFile(filePath = self.lineEdit_pdf.text(),paper_id = paper_id_temp)
-                self.statusbar.showMessage('Archive PDF file sucessfully!')
+            if parser==None:
+                if os.path.exists(self.lineEdit_pdf.text()):
+                    self.file_worker.insertFile(filePath = self.lineEdit_pdf.text(),paper_id = paper_id_temp)
+                    self.statusbar.showMessage('Archive PDF file sucessfully!')
+            else:
+                pass
             self.update_paper_list_in_listwidget()
         except Exception as e:
             error_pop_up('Failure to append paper info!\n{}'.format(str(e)),'Error')

@@ -585,6 +585,13 @@
                         </spacer>
                        </item>
                        <item>
+                        <widget class="QPushButton" name="pushButton_add_paper_clipboard">
+                         <property name="text">
+                          <string>AddFromClipboard</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
                         <widget class="QPushButton" name="pushButton_add_new_paper">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -594,13 +601,6 @@
                          </property>
                          <property name="text">
                           <string>AddPaperFromInput</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_10">
-                         <property name="text">
-                          <string>AddPaperFromCopy</string>
                          </property>
                         </widget>
                        </item>
