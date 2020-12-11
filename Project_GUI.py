@@ -1,6 +1,8 @@
 import sys,os,qdarkstyle
 import ntpath
 import bibtexparser
+from bibtexparser.bwriter import BibTexWriter
+from bibtexparser.bibdatabase import BibDatabase
 import clipboard
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QMenu
 from matplotlib.backends.backend_qt5agg import FigureCanvas
@@ -66,10 +68,13 @@ class MyMainWindow(QMainWindow):
     def __init__(self, parent = None):
         super(MyMainWindow, self).__init__(parent)
         uic.loadUi(os.path.join(script_path,'project_manager.ui'),self)
+        self.widget_terminal.update_name_space('main_gui',self)
         self.setWindowTitle('Scientific Project Manager')
+        #binary string for temp figures from clipboard buffer
         self.base64_string_temp = ''
         self.base64_string_new_input_temp = ''
         self.meta_figure_base_strings = []
+        #menu bar
         self.action = qpageview.viewactions.ViewActions(self)
         self.action.setView(self.widget_view)
         menubar = self.menuBar()
@@ -81,6 +86,9 @@ class MyMainWindow(QMainWindow):
         fileMenu.addAction(self.action.zoom_out)
         fileMenu.addAction(self.action.next_page)
         fileMenu.addAction(self.action.previous_page)
+        #show or hide
+        self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
+        #toolbar action slot functions
         self.actionFitWidth.triggered.connect(lambda:self.action.fit_width.trigger())
         self.actionFitHeight.triggered.connect(lambda:self.action.fit_height.trigger())
         self.actionFitBoth.triggered.connect(lambda:self.action.fit_both.trigger())
@@ -93,51 +101,51 @@ class MyMainWindow(QMainWindow):
         self.actionLocalServerOn.triggered.connect(self.connect_mongo_server)
         self.actionLocalServerOff.triggered.connect(self.stop_mongo_server)
         self.actionLocalClient.triggered.connect(self.start_mongo_client)
-
-        self.widget_terminal.update_name_space('main_gui',self)
-        # self.pushButton_start_server.clicked.connect(self.connect_mongo_server)
-        # self.pushButton_stop_server.clicked.connect(self.stop_mongo_server)
-        # self.pushButton_start_client.clicked.connect(self.start_mongo_client)
-        # self.pushButton_remote_client.clicked.connect(self.start_mongo_client_cloud)
+        #control of projects
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
+        #controls of paper_info
         self.listWidget_papers.itemDoubleClicked.connect(lambda:self.comboBox_papers.setCurrentText(self.listWidget_papers.selectedItems()[0].text()))
+        self.comboBox_papers.activated.connect(self.extract_paper_info)
+        self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
         self.pushButton_add_new_paper.clicked.connect(lambda:self.add_paper_info(parser=None))
         self.pushButton_add_paper_clipboard.clicked.connect(self.fill_input_fields_from_clipboard_buffer)
         self.comboBox_tags.activated.connect(self.display_tag_info)
+        self.comboBox_tags.currentIndexChanged.connect(self.display_tag_info)
         self.comboBox_section_tag_info.activated.connect(self.update_tag_list_in_combo)
+        self.comboBox_section_tag_info.currentIndexChanged.connect(self.update_tag_list_in_combo)
         self.pushButton_update_tag_info.clicked.connect(self.update_tag_info_slot)
         self.pushButton_append_info_new_input.clicked.connect(self.append_new_input)
-        self.comboBox_tag_list.activated.connect(self.extract_tag_contents_slot)
-        self.pushButton_update_info.clicked.connect(self.update_tag_contents_slot)
-        self.comboBox_section.activated.connect(self.update_tag_list_in_existing_input)
-        self.comboBox_section_new_input.activated.connect(self.update_tag_list_in_new_input)
-        self.comboBox_tag_list_new_input.activated.connect(self.update_tag_in_new_input)
-        self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
-        self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
-        self.comboBox_papers.activated.connect(self.extract_paper_info)
         self.comboBox_pick_paper.activated.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
+        self.comboBox_pick_paper.currentIndexChanged.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
         self.pushButton_update_paper.clicked.connect(self.update_paper_info)
         self.pushButton_remove_paper.clicked.connect(self.delete_one_paper)
+        self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
+        #controls of tags
+        self.comboBox_tag_list.activated.connect(self.extract_tag_contents_slot)
+        self.comboBox_tag_list.currentIndexChanged.connect(self.extract_tag_contents_slot)
+        self.pushButton_update_info.clicked.connect(self.update_tag_contents_slot)
+        self.comboBox_section.activated.connect(self.update_tag_list_in_existing_input)
+        self.comboBox_section.currentIndexChanged.connect(self.update_tag_list_in_existing_input)
+        self.comboBox_section_new_input.activated.connect(self.update_tag_list_in_new_input)
+        self.comboBox_section_new_input.currentIndexChanged.connect(self.update_tag_list_in_new_input)
+        self.comboBox_tag_list_new_input.activated.connect(self.update_tag_in_new_input)
+        self.comboBox_tag_list_new_input.currentIndexChanged.connect(self.update_tag_in_new_input)
         self.pushButton_rename.clicked.connect(self.rename_tag)
+        self.pushButton_delete_tag.clicked.connect(self.delete_tag)
+        #extract info
+        self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
+        #open link or pdf 
         self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
+        self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
+        #controls of figures
         self.pushButton_paste_image.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_view,'base64_string_temp'))
         self.pushButton_open_image.clicked.connect(lambda:self.open_image_file(self.widget_view,'base64_string_temp'))
         self.pushButton_paste_figure.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_load_figure.clicked.connect(lambda:self.open_image_file(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
         self.pushButton_save_figure.clicked.connect(self.save_figure_to_filesystem)
-        self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
-        self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
-        self.pushButton_delete_tag.clicked.connect(self.delete_tag)
-        # self.pushButton_db_info.clicked.connect(self.get_database_info)
-
-    def export_bibtex(self):
-        pass
-
-    def import_bibtex(self):
-        pass
 
     #get the info of basic setting of mongodb, e.g. locatin of database storage, config file 
     def get_database_info(self):
@@ -681,6 +689,79 @@ class MyMainWindow(QMainWindow):
             paper_info['url'] = paper_info['url'].rstrip().replace('\n','').replace(' ','')
             self.add_paper_info(parser = paper_info)
 
+    #import bibtex file
+    def import_bibtex(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","bibtex file (*.bib);;all Files (*.*)", options=options)
+        if fileName:
+            with open(fileName) as bibtex_file:
+                bib_database = bibtexparser.load(bibtex_file)
+        else:
+            return
+        record_list = bib_database.get_entry_list()
+        for each_record in record_list:
+            paper_info = {'first_author':each_record.get('first_author',''),
+                        'full_authors':each_record.get('author','Author'),
+                        'paper_type':each_record.get('paper_type','research article'),
+                        'journal':each_record.get('journal',''),
+                        'volume':each_record.get('volume',''),
+                        'issue':each_record.get('number',''),
+                        'page':each_record.get('pages',''),
+                        'year':each_record.get('year',''),
+                        'title':each_record.get('title',''),
+                        'url':each_record.get('url',''),
+                        'doi':each_record.get('doi',''),
+                        'abstract':each_record.get('abstract',''),
+                        'graphical_abstract':image_to_64base_string(os.path.join(script_path,'icons','no_graphical_abstract.png'))
+                        }
+            if paper_info['first_author'] == '':
+                paper_info['first_author'] = paper_info['full_authors'].rstrip().rsplit(',')[0]
+            #remove space in url link
+            paper_info['url'] = paper_info['url'].rstrip().replace('\n','').replace(' ','')
+            self.add_paper_info(parser = paper_info)
+
+    def export_bibtex(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName,_ = QFileDialog.getSaveFileName(self,"QFileDialog.getOpenFileName()", "","bibtex file (*.bib);;all Files (*.*)", options=options)
+        if fileName:
+            paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+            if len(paper_id_list)==0:
+                paper_id_list = ['all']
+            if 'all' in paper_id_list:
+                paper_id_list = self.get_papers_in_a_list()
+            record_list = []
+            bibtex_list = []
+            record_list = list(self.database.paper_info.find({'paper_id':{'$in':paper_id_list}}))
+            keys_map = {'author':'full_authors',
+                        'ID':'paper_id',
+                        'first_author':'first_author',
+                        'journal':'journal',
+                        'volume':'volume',
+                        'pages':'page',
+                        'year':'year',
+                        'title':'title',
+                        'url':'url',
+                        'doi':'doi',
+                        'abstract':'abstract',
+                        'paper_type':'paper_type'
+                        }
+            for record in record_list:
+                temp_info = {}
+                for key_bibtex, key_database in keys_map.items():
+                    temp_info[key_bibtex] = record.get(key_database,'')
+                temp_info['ENTRYTYPE'] = 'article'
+                bibtex_list.append(temp_info)
+            db = BibDatabase()
+            db.entries = bibtex_list
+            writer = BibTexWriter()
+            writer.indent = '    '     # indent entries with 4 spaces instead of one
+            writer.comma_first = True  # place the comma at the beginning of the line
+            with open(fileName, 'w') as bibfile:
+                bibfile.write(writer.write(db))
+                self.statusbar.showMessage('Bibtex file is exported successfully!')
+
     #create a new paper record in database
     def add_paper_info(self, parser = None):
         paper_info = {'first_author':self.lineEdit_1st_author.text(),
@@ -727,10 +808,6 @@ class MyMainWindow(QMainWindow):
             error_pop_up('Failure to append paper info!\n{}'.format(str(e)),'Error')
 
     def extract_all_info(self):
-        text_box = []
-        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
-        tag_list = [item.text() for item in self.listWidget_tags.selectedItems()]
-
         #extract tag content from collection
         def make_text(text_box, collection):
             target = self.database[collection].find({'paper_id':paper_id_list[0]})
@@ -778,6 +855,9 @@ class MyMainWindow(QMainWindow):
                 text_box.pop()
             return text_box
 
+        text_box = []
+        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        tag_list = [item.text() for item in self.listWidget_tags.selectedItems()]
         if 'all' in paper_id_list:
             paper_id_list = self.get_papers_in_a_list()
         if 'all' in tag_list:
