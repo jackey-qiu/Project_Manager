@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>1062</height>
+    <height>1063</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -165,7 +165,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -1357,14 +1357,14 @@ sentence_structure:sentence_structure
                              </item>
                             </widget>
                            </item>
-                           <item row="3" column="0">
+                           <item row="4" column="0">
                             <widget class="QLabel" name="label_36">
                              <property name="text">
                               <string>tag_name</string>
                              </property>
                             </widget>
                            </item>
-                           <item row="3" column="1">
+                           <item row="4" column="1">
                             <widget class="QLineEdit" name="lineEdit_tag_name_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1409,7 +1409,7 @@ sentence_structure:sentence_structure
                              </property>
                             </widget>
                            </item>
-                           <item row="4" column="0">
+                           <item row="6" column="0">
                             <widget class="QPushButton" name="pushButton_extract_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1428,7 +1428,7 @@ sentence_structure:sentence_structure
                              </property>
                             </widget>
                            </item>
-                           <item row="4" column="1">
+                           <item row="6" column="1">
                             <widget class="QPushButton" name="pushButton_save_figure">
                              <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1438,6 +1438,23 @@ sentence_structure:sentence_structure
                              </property>
                              <property name="text">
                               <string>Save</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="3" column="0">
+                            <widget class="QLabel" name="label_40">
+                             <property name="text">
+                              <string>Fig_tags</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="3" column="1">
+                            <widget class="QComboBox" name="comboBox_fig_tags">
+                             <property name="minimumSize">
+                              <size>
+                               <width>120</width>
+                               <height>0</height>
+                              </size>
                              </property>
                             </widget>
                            </item>

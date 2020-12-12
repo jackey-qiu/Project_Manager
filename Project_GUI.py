@@ -148,6 +148,10 @@ class MyMainWindow(QMainWindow):
         self.comboBox_section_new_input.currentIndexChanged.connect(self.update_tag_list_in_new_input)
         self.comboBox_tag_list_new_input.activated.connect(self.update_tag_in_new_input)
         self.comboBox_tag_list_new_input.currentIndexChanged.connect(self.update_tag_in_new_input)
+        self.comboBox_section_figure.activated.connect(self.get_figure_tag_list_by_paper_id_and_collection_name)
+        self.comboBox_section_figure.currentIndexChanged.connect(self.get_figure_tag_list_by_paper_id_and_collection_name)
+        self.comboBox_fig_tags.activated.connect(lambda:self.lineEdit_tag_name_figure.setText(self.comboBox_fig_tags.currentText()))
+        self.comboBox_fig_tags.currentIndexChanged.connect(lambda:self.lineEdit_tag_name_figure.setText(self.comboBox_fig_tags.currentText()))
         self.pushButton_rename.clicked.connect(self.rename_tag)
         self.pushButton_delete_tag.clicked.connect(self.delete_tag)
         #extract info
@@ -463,6 +467,14 @@ class MyMainWindow(QMainWindow):
     def get_tag_list_by_paper_id_and_collection_name(self,paper_id,collection_name):
         tag_list = [each['tag_name'] for each in self.database[collection_name].find({'paper_id':paper_id})]
         return sorted(tag_list)
+
+    def get_figure_tag_list_by_paper_id_and_collection_name(self):
+        paper_id = self.lineEdit_paper_id_figure.text()
+        collection_name = self.comboBox_section_figure.currentText()
+        tag_list = [each['tag_name'] for each in self.database[collection_name].find({'paper_id':paper_id}) if type(each['tag_content'][0])==type(b'')]
+        self.comboBox_fig_tags.clear()
+        self.comboBox_fig_tags.addItems(sorted(tag_list))
+        #return sorted(tag_list)
 
     def update_tag_contents_slot(self):
         #paper_id = self.lineEdit_paper_id.text()
@@ -986,13 +998,16 @@ class GFS(object):
         if results == None:
             return
         bdata, attri = results
-        name = attri['filename']
+        #name = attri['filename']
+        name = '{}.pdf'.format(paper_id)
         if path!=None:
             name = os.path.join(path, name)
-        if name:
+        if not os.path.exists(name):
             output = open(name, 'wb')
-        output.write(bdata)
-        output.close()
+            output.write(bdata)
+            output.close()
+        else:
+            pass
         # error_pop_up("Success to fetch and save file with filename of {}!".format(name),'Information')
         return name
  
