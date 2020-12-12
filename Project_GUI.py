@@ -1,5 +1,6 @@
 import sys,os,qdarkstyle
 import ntpath
+import fitz
 import bibtexparser
 from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
@@ -8,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox,
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import uic, QtCore
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QCursor, QImage
 import PyQt5
 import pyqtgraph as pg
 import random,copy
@@ -69,6 +70,10 @@ class MyMainWindow(QMainWindow):
         super(MyMainWindow, self).__init__(parent)
         uic.loadUi(os.path.join(script_path,'project_manager.ui'),self)
         self.widget_terminal.update_name_space('main_gui',self)
+        #set plaintext style
+        self.plainTextEdit_pdf_text.setStyleSheet(
+                """QPlainTextEdit {background-color: #FFFFFF;
+                    color: #6600CC;}""")
         self.setWindowTitle('Scientific Project Manager')
         #binary string for temp figures from clipboard buffer
         self.base64_string_temp = ''
@@ -101,6 +106,17 @@ class MyMainWindow(QMainWindow):
         self.actionLocalServerOn.triggered.connect(self.connect_mongo_server)
         self.actionLocalServerOff.triggered.connect(self.stop_mongo_server)
         self.actionLocalClient.triggered.connect(self.start_mongo_client)
+        #control of pdf viewer (image render)
+        self.action_pdf = qpageview.viewactions.ViewActions(self)
+        self.action_pdf.setView(self.widget_pdf_viewer)
+        self.pushButton_fit_width.clicked.connect(lambda:self.action_pdf.fit_width.trigger())
+        self.pushButton_fit_height.clicked.connect(lambda:self.action_pdf.fit_height.trigger())
+        self.pushButton_fit_page.clicked.connect(lambda:self.action_pdf.fit_both.trigger())
+        self.pushButton_next.clicked.connect(lambda:self.action_pdf.next_page.trigger())
+        self.pushButton_previous.clicked.connect(lambda:self.action_pdf.previous_page.trigger())
+        self.pushButton_zoomin.clicked.connect(lambda:self.action_pdf.zoom_in.trigger())
+        self.pushButton_zoomout.clicked.connect(lambda:self.action_pdf.zoom_out.trigger())
+        self.pushButton_extract_pdf_text.clicked.connect(lambda:self.plainTextEdit_pdf_text.setPlainText(self.doc_pdf[self.widget_pdf_viewer.currentPageNumber()-1].getText()))
         #control of projects
         self.pushButton_new_project.clicked.connect(self.new_project_dialog)
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
@@ -138,7 +154,9 @@ class MyMainWindow(QMainWindow):
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
         #open link or pdf 
         self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
-        self.pushButton_open_pdf.clicked.connect(self.open_pdf_file)
+        self.pushButton_open_pdf.clicked.connect(lambda:self.open_pdf_file(use_external_app=True))
+        self.pushButton_pdf_to_image.clicked.connect(lambda:self.open_pdf_file(use_external_app=False))
+        self.pushButton_pdf_to_image.clicked.connect(lambda:self.action_pdf.fit_width.trigger())
         #controls of figures
         self.pushButton_paste_image.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_view,'base64_string_temp'))
         self.pushButton_open_image.clicked.connect(lambda:self.open_image_file(self.widget_view,'base64_string_temp'))
@@ -618,7 +636,11 @@ class MyMainWindow(QMainWindow):
         except Exception as e:
             error_pop_up('Fail to delete the pdf file.\n{}'.format(str(e)),'Error')
 
-    def open_pdf_file(self):
+    def _form_qimage(self,pix):
+        fmt = QImage.Format_RGBA8888 if pix.alpha else QImage.Format_RGB888
+        return QImage(pix.samples, pix.width, pix.height, pix.stride, fmt)
+
+    def open_pdf_file(self, use_external_app = True):
         paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
         if 'all' in paper_id_list:
             paper_id_list = self.get_papers_in_a_list()
@@ -626,7 +648,13 @@ class MyMainWindow(QMainWindow):
             paper_id = paper_id_list[0]
             try:
                 full_path = self.file_worker.write_2_disk(paper_id, os.path.join(script_path,'temp_pdf_files'))
-                webbrowser.open_new(r'file://{}'.format(full_path))
+                if use_external_app:
+                    webbrowser.open_new(r'file://{}'.format(full_path))
+                else:
+                    doc = fitz.open(full_path)
+                    qimages = [self._form_qimage(each.getPixmap(matrix = fitz.Matrix(3,3))) for each in doc]
+                    self.doc_pdf = doc
+                    self.widget_pdf_viewer.loadImages(qimages)
             except Exception as e:
                 error_pop_up('Fail to open the pdf file.\n{}'.format(str(e)),'Error')
         else:
@@ -739,6 +767,7 @@ class MyMainWindow(QMainWindow):
                         'first_author':'first_author',
                         'journal':'journal',
                         'volume':'volume',
+                        'number':'issue',
                         'pages':'page',
                         'year':'year',
                         'title':'title',
