@@ -550,12 +550,6 @@ class MyMainWindow(QMainWindow):
         tag_name = self.lineEdit_tag_new_input.text()
         tag_content = self.textEdit_tag_content_new_input.toPlainText()
         location = self.lineEdit_location_new_input.text()
-        '''
-        if self.checkBox_check_tag.isChecked():
-            if tag_name in self.get_tag_list_by_paper_id_and_collection_name(paper_id, collection): #self.get_tags_in_a_list():
-                error_pop_up('This is supposed to be a new tag, but the tag you provided is already existed. \nPick a different one please! If it is supposed to be an existed tag, check off the newtag checkbox! And do again!','Error')
-                return
-        '''
         if self.checkBox_figure.isChecked():
             if self.base64_string_new_input_temp == '':
                 error_pop_up('This is supposed to be a figure tag, please load a figure or paste a figure first!','Error')
@@ -626,7 +620,6 @@ class MyMainWindow(QMainWindow):
         else:
             self.lineEdit_pdf.setText('Not existing!')
 
-
     def delete_one_paper(self):
         paper_id = self.comboBox_papers.currentText()
         reply = QMessageBox.question(self, 'Message', 'Are you sure to delete this paper?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
@@ -652,6 +645,8 @@ class MyMainWindow(QMainWindow):
         fmt = QImage.Format_RGBA8888 if pix.alpha else QImage.Format_RGB888
         return QImage(pix.samples, pix.width, pix.height, pix.stride, fmt)
 
+    #if use_external_app = True, then open pdf file using system wide default pdf viewer
+    #otherwise the pdf pages will be converted to images and be rendered in the app
     def open_pdf_file(self, use_external_app = True):
         paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
         if 'all' in paper_id_list:
@@ -704,6 +699,7 @@ class MyMainWindow(QMainWindow):
         except Exception as e:
             error_pop_up('Fail to update the paper info :-(\n{}'.format(str(e)),'Error')
 
+    #the buffer must be a complete string of bibtex record including paranthesis
     def fill_input_fields_from_clipboard_buffer(self):
         bib_database = bibtexparser.loads(clipboard.paste())
         if len(bib_database.entries)==0:

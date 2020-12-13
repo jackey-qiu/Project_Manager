@@ -182,13 +182,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_9">
-                <property name="text">
-                 <string>ExportBiTex</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="pushButton_open_url">
                 <property name="text">
                  <string>OpenURL</string>
