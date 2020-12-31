@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>1063</height>
+    <height>1027</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -325,7 +325,7 @@
                   </widget>
                   <widget class="QTabWidget" name="tabWidget_2">
                    <property name="currentIndex">
-                    <number>1</number>
+                    <number>0</number>
                    </property>
                    <widget class="QWidget" name="tab_5">
                     <attribute name="title">
@@ -470,7 +470,7 @@
                        </widget>
                        <widget class="QTabWidget" name="tabWidget_3">
                         <property name="currentIndex">
-                         <number>0</number>
+                         <number>1</number>
                         </property>
                         <widget class="QWidget" name="tab_7">
                          <attribute name="title">
@@ -546,6 +546,13 @@
                            <width>150</width>
                            <height>0</height>
                           </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_new_paper">
+                         <property name="text">
+                          <string>NewPaper</string>
                          </property>
                         </widget>
                        </item>
@@ -1691,6 +1698,7 @@ sentence_structure:sentence_structure
    <addaction name="actionLocalClient"/>
    <addaction name="actionDatabaseInfo"/>
    <addaction name="separator"/>
+   <addaction name="actionSearchDB"/>
    <addaction name="actionImportBiTex"/>
    <addaction name="actionExportBiTex"/>
    <addaction name="separator"/>
@@ -1831,6 +1839,15 @@ sentence_structure:sentence_structure
    </property>
    <property name="toolTip">
     <string>get database information</string>
+   </property>
+  </action>
+  <action name="actionSearchDB">
+   <property name="icon">
+    <iconset>
+     <normaloff>../Project_Manager/icons/search.png</normaloff>../Project_Manager/icons/search.png</iconset>
+   </property>
+   <property name="text">
+    <string>SearchDB</string>
    </property>
   </action>
  </widget>

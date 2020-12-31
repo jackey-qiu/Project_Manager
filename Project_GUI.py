@@ -106,6 +106,7 @@ class MyMainWindow(QMainWindow):
         self.actionLocalServerOn.triggered.connect(self.connect_mongo_server)
         self.actionLocalServerOff.triggered.connect(self.stop_mongo_server)
         self.actionLocalClient.triggered.connect(self.start_mongo_client)
+        self.actionSearchDB.triggered.connect(self.search_database)
         #control of pdf viewer (image render)
         self.action_pdf = qpageview.viewactions.ViewActions(self)
         self.action_pdf.setView(self.widget_pdf_viewer)
@@ -127,6 +128,7 @@ class MyMainWindow(QMainWindow):
         self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
         self.pushButton_add_new_paper.clicked.connect(lambda:self.add_paper_info(parser=None))
         self.pushButton_add_paper_clipboard.clicked.connect(self.fill_input_fields_from_clipboard_buffer)
+        self.pushButton_new_paper.clicked.connect(self.new_paper)
         self.comboBox_tags.activated.connect(self.display_tag_info)
         self.comboBox_tags.currentIndexChanged.connect(self.display_tag_info)
         self.comboBox_section_tag_info.activated.connect(self.update_tag_list_in_combo)
@@ -290,9 +292,13 @@ class MyMainWindow(QMainWindow):
 
     def start_mongo_client_cloud(self):
         try:
-            self.mongo_client = MongoClient('mongodb+srv://jackey:Qiu112439@cluster0.sjw9m.mongodb.net/<dbname>?retryWrites=true&w=majority')
-            self.comboBox_project_list.clear()
-            self.comboBox_project_list.addItems(self.get_database_in_a_list())
+            if not os.path.exists(os.path.join(script_path,'private','atlas_password')):
+                error_pop_up('You should create a file named atlas_password under Project_Manager/private folder, where you save the password for your MongoDB atlas cloud account')
+            else:
+                with open(os.path.join(script_path,'private','atlas_password')) as f:
+                    self.mongo_client = MongoClient(f.read().rstrip())
+                    self.comboBox_project_list.clear()
+                    self.comboBox_project_list.addItems(self.get_database_in_a_list())
         except Exception as e:
             error_pop_up('Fail to start mongo client.'+'\n{}'.format(str(e)),'Error')
 
@@ -581,6 +587,63 @@ class MyMainWindow(QMainWindow):
         #set this back to ''
         self.base64_string_new_input_temp = ''
 
+    def search_database(self):
+        dlg = QueryDialog(self)
+        dlg.exec()
+
+    def _and_opt(self, list_1, list_2):
+        return_list = []
+        if len(list_1)<len(list_2):
+            list_1, list_2 = list_2, list_1
+        for each in list_1:
+            if each in list_2:
+                return_list.append(each)
+        return return_list
+
+    def _or_opt(self,list_1, list_2):
+        return list(set(list_1+list_2))
+
+    def query_by_field(self, field, query_string):
+        """[return the paper_ids according the query_string w.r.t the specified field]
+
+        Args:
+            field ([string]): in ['full_authors','journal','year','abstract','title']
+            query_string ([string]): [the query string you want to perform, e.g. 1999 for field = 'year']
+
+        Returns:
+            [list]: [paper_id list]
+        """
+        index_name = self.database.paper_info.create_index([(field,'text')])
+        targets = self.database.paper_info.find({"$text": {"$search": "\"{}\"".format(query_string)}})
+        #drop the index afterwards
+        return_list = [each['paper_id'] for each in targets]
+        self.database.paper_info.drop_index(index_name)
+        # print(field, return_list)
+
+        return return_list
+        
+    def query_info(self):
+        fields = ['title','abstract','full_authors','journal','year']
+        query_strings = [self.query_string_title, self.query_string_abstract, self.query_string_author, self.query_string_journal, self.query_string_year]
+        compound_operators = [self.query_opt_title,self.query_opt_abstract, self.query_opt_author, self.query_opt_journal, self.query_opt_year]
+        kept_index = [i for i in range(len(compound_operators)) if (compound_operators[i]!='na' and query_strings[i]!='')]
+        def _update(container):
+            new = []
+            for i,item in enumerate(container):
+                if i in kept_index:
+                    new.append(item)
+            return new
+        fields, query_strings, compound_operators = _update(fields), _update(query_strings), _update(compound_operators)
+        return_paper_ids = []
+        compound_operators[0] = 'or'
+        for i, field in enumerate(fields):
+            temp_paper_list = self.query_by_field(field, query_strings[i])
+            if compound_operators[i]=='and':
+                return_paper_ids = self._and_opt(return_paper_ids, temp_paper_list)
+            elif compound_operators[i]=='or':
+                return_paper_ids = self._or_opt(return_paper_ids, temp_paper_list)
+        return return_paper_ids
+
     def get_papers_by_tag(self, name_db, tag = {'first_author':'qiu'}):
         all_info = list(self.mongo_client[name_db].paper_info.find(tag,{'_id':0}))
         return all_info
@@ -619,6 +682,24 @@ class MyMainWindow(QMainWindow):
             self.lineEdit_pdf.setText(str(pdf))
         else:
             self.lineEdit_pdf.setText('Not existing!')
+
+    def new_paper(self):
+        """clear input fields and get ready to create a new paper
+        """
+        self.lineEdit_1st_author.setText('')
+        self.lineEdit_full_author.setText('')
+        self.lineEdit_paper_type.setText('')
+        self.lineEdit_journal.setText('')
+        self.lineEdit_volume.setText('')
+        self.lineEdit_issue.setText('')
+        self.lineEdit_page.setText('')
+        self.lineEdit_year.setText('')
+        self.lineEdit_title.setText('')
+        self.lineEdit_url.setText('')
+        self.lineEdit_doi.setText('')
+        self.lineEdit_pdf.setText('')
+        self.textEdit_abstract.setPlainText('')
+        self.widget_view.clear()
 
     def delete_one_paper(self):
         paper_id = self.comboBox_papers.currentText()
@@ -941,6 +1022,53 @@ class NewProject(QDialog):
                                                                              db_info = self.textEdit_introduction.toPlainText(),
                                                                              type_db ='paper'))
         self.pushButton_cancel.clicked.connect(lambda:self.close())
+
+class QueryDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        # Load the dialog's GUI
+        uic.loadUi(os.path.join(script_path,"query_dialog.ui"), self)
+        self.pushButton_clear.clicked.connect(self.clear_fields)
+        self.pushButton_search.clicked.connect(self.search)
+        self.pushButton_exit.clicked.connect(lambda:self.close())
+    
+    def clear_fields(self):
+        self.lineEdit_title.setText('')
+        self.lineEdit_abstract.setText('')
+        self.lineEdit_author.setText('')
+        self.lineEdit_journal.setText('')
+        self.lineEdit_year.setText('')
+
+    def search(self):
+        self.parent.query_string_title = self.lineEdit_title.text()
+        self.parent.query_string_abstract = self.lineEdit_abstract.text()
+        self.parent.query_string_author = self.lineEdit_author.text()
+        self.parent.query_string_journal = self.lineEdit_journal.text()
+        self.parent.query_string_year = self.lineEdit_year.text()
+
+        self.parent.query_opt_title = self.comboBox_title.currentText()
+        self.parent.query_opt_abstract = self.comboBox_abstract.currentText()
+        self.parent.query_opt_author = self.comboBox_author.currentText()
+        self.parent.query_opt_journal = self.comboBox_journal.currentText()
+        self.parent.query_opt_year = self.comboBox_year.currentText()
+
+        self.parent.database.paper_info.drop_indexes()
+
+        paper_ids = self.parent.query_info()
+        text_box = []
+
+        #self.textEdit_query_info.setText('\n'.join(self.parent.query_info()))
+        for each in paper_ids:
+            text_box.append(each)
+            #extract paper info
+            text_box.append('##paper_info##')
+            target = self.parent.database.paper_info.find_one({'paper_id':each})
+            keys = ['full_authors','journal','year','title','url','doi','abstract']
+            for each_key in keys:
+                text_box.append('{}:  {}'.format('  '+each_key,target[each_key]))
+            text_box.append('\n')
+        self.textEdit_query_info.setText('\n'.join(text_box))
 
 #class to store to and rechieve file from database
 class GFS(object):
