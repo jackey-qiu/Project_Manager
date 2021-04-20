@@ -8,7 +8,7 @@ import clipboard
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QMenu
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
-from PyQt5 import uic, QtCore
+from PyQt5 import uic, QtCore, QtGui
 from PyQt5.QtGui import QCursor, QImage
 import PyQt5
 import pyqtgraph as pg
@@ -22,9 +22,10 @@ except:
     import locate_path
 script_path = locate_path.module_path_locator()
 import pandas as pd
-import time
+import time, datetime
 import matplotlib
-matplotlib.use("TkAgg")
+#matplotlib.use("TkAgg")
+os.environ["QT_MAC_WANTS_LAYER"] = "1"
 try:
     import ConfigParser
 except:
@@ -65,10 +66,94 @@ def image_string_to_qimage(my_string, img_format = 'PNG'):
     QImage.loadFromData(QByteArr, img_format)
     return QImage
 
+class PandasModel(QtCore.QAbstractTableModel):
+    """
+    Class to populate a table view with a pandas dataframe
+    """
+    def __init__(self, data, tableviewer, main_gui, parent=None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self._data = data
+        self.tableviewer = tableviewer
+        self.main_gui = main_gui
+
+    def rowCount(self, parent=None):
+        return self._data.shape[0]
+
+    def columnCount(self, parent=None):
+        return self._data.shape[1]
+
+    def data(self, index, role):
+        if index.isValid():
+            if role in [QtCore.Qt.DisplayRole, QtCore.Qt.EditRole] and index.column()!=0:
+                return str(self._data.iloc[index.row(), index.column()])
+            if role == QtCore.Qt.BackgroundRole and index.row()%2 == 0:
+                #return QtGui.QColor('lightGray')
+                return QtGui.QColor('green')
+            if role == QtCore.Qt.BackgroundRole and index.row()%2 == 1:
+                # return QtGui.QColor('cyan')
+                return QtGui.QColor('lightGreen')
+            if role == QtCore.Qt.ForegroundRole and index.row()%2 == 1:
+                return QtGui.QColor('black')
+            if role == QtCore.Qt.CheckStateRole and index.column()==0:
+                if self._data.iloc[index.row(),index.column()]:
+                    return QtCore.Qt.Checked
+                else:
+                    return QtCore.Qt.Unchecked
+        return None
+
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+        if role == QtCore.Qt.CheckStateRole and index.column() == 0:
+            if value == QtCore.Qt.Checked:
+                self._data.iloc[index.row(),index.column()] = True
+            else:
+                self._data.iloc[index.row(),index.column()] = False
+        else:
+            if str(value)!='':
+                self._data.iloc[index.row(),index.column()] = str(value)
+        if self._data.columns.tolist()[index.column()] in ['select','archive_data','user_label','read_level']:
+            self.main_gui.update_meta_info_paper(paper_id = self._data['paper_id'][index.row()])
+        self.dataChanged.emit(index, index)
+        self.layoutAboutToBeChanged.emit()
+        self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount(0), self.columnCount(0)))
+        self.layoutChanged.emit()
+        self.tableviewer.resizeColumnsToContents() 
+        return True
+
+    def update_view(self):
+        self.layoutAboutToBeChanged.emit()
+        self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount(0), self.columnCount(0)))
+        self.layoutChanged.emit()
+
+    def headerData(self, rowcol, orientation, role):
+        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return self._data.columns[rowcol]         
+        if orientation == QtCore.Qt.Vertical and role == QtCore.Qt.DisplayRole:
+            return self._data.index[rowcol]         
+        return None
+
+    def flags(self, index):
+        if not index.isValid():
+           return QtCore.Qt.NoItemFlags
+        else:
+            if index.column()==0:
+                return (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
+            else:
+                return (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable)
+
+    def sort(self, Ncol, order):
+        """Sort table by given column number."""
+        self.layoutAboutToBeChanged.emit()
+        self._data = self._data.sort_values(self._data.columns.tolist()[Ncol],
+                                        ascending=order == QtCore.Qt.AscendingOrder, ignore_index = True)
+        self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount(0), self.columnCount(0)))
+        self.layoutChanged.emit()
+
 class MyMainWindow(QMainWindow):
     def __init__(self, parent = None):
         super(MyMainWindow, self).__init__(parent)
-        uic.loadUi(os.path.join(script_path,'project_manager.ui'),self)
+        uic.loadUi(os.path.join(script_path,'project_manager_new.ui'),self)
         self.widget_terminal.update_name_space('main_gui',self)
         #set plaintext style
         self.plainTextEdit_pdf_text.setStyleSheet(
@@ -92,7 +177,7 @@ class MyMainWindow(QMainWindow):
         fileMenu.addAction(self.action.next_page)
         fileMenu.addAction(self.action.previous_page)
         #show or hide
-        self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
+        # self.pushButton_hide_show.clicked.connect(lambda:self.frame_3.setVisible(not self.frame_3.isVisible()))
         #toolbar action slot functions
         self.actionFitWidth.triggered.connect(lambda:self.action.fit_width.trigger())
         self.actionFitHeight.triggered.connect(lambda:self.action.fit_height.trigger())
@@ -123,7 +208,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_update_project_info.clicked.connect(self.update_project_info)
         self.pushButton_load.clicked.connect(self.load_project)
         #controls of paper_info
-        self.listWidget_papers.itemDoubleClicked.connect(lambda:self.comboBox_papers.setCurrentText(self.listWidget_papers.selectedItems()[0].text()))
+        # self.listWidget_papers.itemDoubleClicked.connect(lambda:self.comboBox_papers.setCurrentText(self.listWidget_papers.selectedItems()[0].text()))
         self.comboBox_papers.activated.connect(self.extract_paper_info)
         self.comboBox_papers.currentIndexChanged.connect(self.extract_paper_info)
         self.pushButton_add_new_paper.clicked.connect(lambda:self.add_paper_info(parser=None))
@@ -135,8 +220,8 @@ class MyMainWindow(QMainWindow):
         self.comboBox_section_tag_info.currentIndexChanged.connect(self.update_tag_list_in_combo)
         self.pushButton_update_tag_info.clicked.connect(self.update_tag_info_slot)
         self.pushButton_append_info_new_input.clicked.connect(self.append_new_input)
-        self.comboBox_pick_paper.activated.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
-        self.comboBox_pick_paper.currentIndexChanged.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
+        # self.comboBox_pick_paper.activated.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
+        # self.comboBox_pick_paper.currentIndexChanged.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
         self.pushButton_update_paper.clicked.connect(self.update_paper_info)
         self.pushButton_remove_paper.clicked.connect(self.delete_one_paper)
         self.pushButton_remove_pdf.clicked.connect(self.delete_pdf_file)
@@ -150,17 +235,17 @@ class MyMainWindow(QMainWindow):
         self.comboBox_section_new_input.currentIndexChanged.connect(self.update_tag_list_in_new_input)
         self.comboBox_tag_list_new_input.activated.connect(self.update_tag_in_new_input)
         self.comboBox_tag_list_new_input.currentIndexChanged.connect(self.update_tag_in_new_input)
-        self.comboBox_section_figure.activated.connect(self.get_figure_tag_list_by_paper_id_and_collection_name)
-        self.comboBox_section_figure.currentIndexChanged.connect(self.get_figure_tag_list_by_paper_id_and_collection_name)
-        self.comboBox_fig_tags.activated.connect(lambda:self.lineEdit_tag_name_figure.setText(self.comboBox_fig_tags.currentText()))
-        self.comboBox_fig_tags.currentIndexChanged.connect(lambda:self.lineEdit_tag_name_figure.setText(self.comboBox_fig_tags.currentText()))
+        # self.comboBox_section_figure.activated.connect(self.get_figure_tag_list_by_paper_id_and_collection_name)
+        # self.comboBox_section_figure.currentIndexChanged.connect(self.get_figure_tag_list_by_paper_id_and_collection_name)
+        # self.comboBox_fig_tags.activated.connect(lambda:self.lineEdit_tag_name_figure.setText(self.comboBox_fig_tags.currentText()))
+        # self.comboBox_fig_tags.currentIndexChanged.connect(lambda:self.lineEdit_tag_name_figure.setText(self.comboBox_fig_tags.currentText()))
         self.pushButton_rename.clicked.connect(self.rename_tag)
         self.pushButton_delete_tag.clicked.connect(self.delete_tag)
         #extract info
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
         #open link or pdf 
-        self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
-        self.pushButton_open_pdf.clicked.connect(lambda:self.open_pdf_file(use_external_app=True))
+        # self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
+        self.pushButton_open_pdf.clicked.connect(lambda:self.open_pdf_file(use_external_app=False))
         self.pushButton_pdf_to_image.clicked.connect(lambda:self.open_pdf_file(use_external_app=False))
         self.pushButton_pdf_to_image.clicked.connect(lambda:self.action_pdf.fit_width.trigger())
         #controls of figures
@@ -168,8 +253,18 @@ class MyMainWindow(QMainWindow):
         self.pushButton_open_image.clicked.connect(lambda:self.open_image_file(self.widget_view,'base64_string_temp'))
         self.pushButton_paste_figure.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_figure_input,'base64_string_new_input_temp'))
         self.pushButton_load_figure.clicked.connect(lambda:self.open_image_file(self.widget_figure_input,'base64_string_new_input_temp'))
-        self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
-        self.pushButton_save_figure.clicked.connect(self.save_figure_to_filesystem)
+        # self.pushButton_extract_figure.clicked.connect(self.load_figure_from_database)
+        # self.pushButton_save_figure.clicked.connect(self.save_figure_to_filesystem)
+        self.pushButton_select_all.clicked.connect(self.select_all)
+        self.pushButton_select_none.clicked.connect(self.select_none)
+
+    def select_all(self):
+        self.pandas_model_paper_info._data['select'] = True
+        self.pandas_model_paper_info.update_view()
+
+    def select_none(self):
+        self.pandas_model_paper_info._data['select'] = False
+        self.pandas_model_paper_info.update_view()
 
     #get the info of basic setting of mongodb, e.g. locatin of database storage, config file 
     def get_database_info(self):
@@ -311,9 +406,10 @@ class MyMainWindow(QMainWindow):
 
     def load_project(self):
         self.database = self.mongo_client[self.comboBox_project_list.currentText()]
-
         self.extract_project_info()
-        self.update_paper_list_in_listwidget()
+        #self.update_paper_list_in_listwidget()
+        self.init_pandas_model_from_db()
+        self.update_paper_list_in_combobox()
         self.update_tag_list_in_listwidget()
         self.create_instance_for_file_storage()
 
@@ -381,8 +477,8 @@ class MyMainWindow(QMainWindow):
         self.comboBox_paper_ids.addItems(papers)
         self.comboBox_papers.clear()
         self.comboBox_papers.addItems(papers)
-        self.comboBox_pick_paper.clear()
-        self.comboBox_pick_paper.addItems(papers)
+        # self.comboBox_pick_paper.clear()
+        # self.comboBox_pick_paper.addItems(papers)
 
     def rename_tag(self):
         new_tag_name = self.lineEdit_renamed_tag.text()
@@ -712,7 +808,8 @@ class MyMainWindow(QMainWindow):
                 self.delete_pdf_file()
                 self.statusbar.clearMessage()
                 self.statusbar.showMessage('Update the paper info successfully:-)')
-                self.update_paper_list_in_listwidget()
+                # self.update_paper_list_in_listwidget()
+                self.update_paper_list_in_combobox()
             except:
                 error_pop_up('Fail to delete the paper info!','Error')
 
@@ -729,9 +826,9 @@ class MyMainWindow(QMainWindow):
     #if use_external_app = True, then open pdf file using system wide default pdf viewer
     #otherwise the pdf pages will be converted to images and be rendered in the app
     def open_pdf_file(self, use_external_app = True):
-        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
-        if 'all' in paper_id_list:
-            paper_id_list = self.get_papers_in_a_list()
+        # paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        #paper_id_list = self.pandas_model_paper_info._data[self.pandas_model_paper_info._data['select']]['paper_id'].tolist()
+        paper_id_list = [self.comboBox_papers.currentText()]
         if len(paper_id_list)>0:
             paper_id = paper_id_list[0]
             try:
@@ -843,7 +940,8 @@ class MyMainWindow(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName,_ = QFileDialog.getSaveFileName(self,"QFileDialog.getOpenFileName()", "","bibtex file (*.bib);;all Files (*.*)", options=options)
         if fileName:
-            paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+            # paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+            paper_id_list = self.pandas_model_paper_info._data[self.pandas_model_paper_info._data['select']]['paper_id'].tolist()
             if len(paper_id_list)==0:
                 paper_id_list = ['all']
             if 'all' in paper_id_list:
@@ -908,6 +1006,11 @@ class MyMainWindow(QMainWindow):
                 paper_id_temp = paper_id_temp + str(i)
                 break
         paper_info['paper_id'] = paper_id_temp
+        paper_info['select'] = False
+        paper_info['archive_date'] = datetime.datetime.today().strftime('%Y-%m-%d')
+        paper_info['user_label'] = 'user_label'
+        paper_info['read_level'] = 0
+
         # if os.path.exists(self.lineEdit_pdf.text()):
             # self.file_worker.insertFile(filePath = self.lineEdit_pdf.text(),paper_id = paper_id_temp)
         try:
@@ -921,7 +1024,10 @@ class MyMainWindow(QMainWindow):
                     self.statusbar.showMessage('Archive PDF file sucessfully!')
             else:
                 pass
-            self.update_paper_list_in_listwidget()
+            #self.update_paper_list_in_listwidget()
+            self.init_pandas_model_from_db()
+            self.update_paper_list_in_combobox()
+            self.comboBox_papers.setCurrentText(paper_id_temp)
         except Exception as e:
             error_pop_up('Failure to append paper info!\n{}'.format(str(e)),'Error')
 
@@ -929,43 +1035,61 @@ class MyMainWindow(QMainWindow):
         #extract tag content from collection
         def make_text(text_box, collection):
             target = self.database[collection].find({'paper_id':paper_id_list[0]})
-            text_box.append('\n##{}##'.format(collection))
+            # text_box.append('\n##{}##'.format(collection))
+            text_box.append('<br><h3 style="color:Magenta;margin-left:0px;">{}</h3>'.format('##{}##'.format(collection)))
             ii = 0
             for each in target:
                 ii += 1
-                text_box.append('  '+each['tag_name'])
+                # text_box.append('  '+each['tag_name'])
+                text_box.append('<h3 style="color:green;margin-left:20px;">{}</h3>'.format(each['tag_name']))
                 for i,each_tag_content in enumerate(each['tag_content']):
                     if type(each_tag_content)==type(b''):
-                        each_tag_content = '<<figure string>>NOT SHOWING HERE!'
-                    if i>=len(each['location']):
-                        text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content))
+                        each_tag_content = '<p style="margin-left:20px;"><img src="data:image/png;base64,{}" max-height="600px"/></p>'.format(each_tag_content.decode('utf-8'))
+                        if i>=len(each['location']):
+                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][-1]),each_tag_content))
+                        else:
+                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][i]),each_tag_content))
                     else:
-                        text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content))
+                        if i>=len(each['location']):
+                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content)))
+                        else:
+                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content)))
             if ii == 0:
                 text_box.pop()
             return text_box
 
         #extract tag conent from collection with tag_name for papers with paper_ids
         def make_text2(text_box, collection, tag_name, paper_id_list):
-            text_box.append('\n##{}##'.format(collection))
-            text_box.append('  '+tag_name)
+            # text_box.append('\n##{}##'.format(collection))
+            text_box.append('<br><h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('##{}##'.format(collection)))
+            # text_box.append('  '+tag_name)
+            text_box.append('<h3 style="color:green;margin-left:20px;">{}</h3>'.format(tag_name))
             jj = 0
             for paper_id in paper_id_list:
-                text_box.append('    '+paper_id)
+                # text_box.append('    '+paper_id)
+                text_box.append('<h3 style="color:green;margin-left:20px;">{}</h3>'.format(paper_id))
                 target = self.database[collection].find({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
                 ii = 0
                 for each in target:
                     ii += 1
                     for i,each_tag_content in enumerate(each['tag_content']):
                         if type(each_tag_content)==type(b''):
-                            each_tag_content = '<<figure string>>NOT SHOWING HERE!'
+                            each_tag_content = '<p style="margin-left:20px;"><img src="data:image/png;base64,{}" max-height="600px"/></p>'.format(each_tag_content.decode('utf-8'))
+                            # each_tag_content = '<img style="margin-left:20px;" src="data:image/png;base64,{}" height="400"/>'.format(each_tag_content.decode('utf-8'))
                             jj+=1
-                        if i>=len(each['location']):
-                            text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content))
-                            jj+=1
+                            if i>=len(each['location']):
+                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][-1]),each_tag_content))
+                                jj+=1
+                            else:
+                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][i]),each_tag_content))
+                                jj+=1
                         else:
-                            text_box.append('      {}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content))
-                            jj+=1
+                            if i>=len(each['location']):
+                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content)))
+                                jj+=1
+                            else:
+                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content)))
+                                jj+=1
                 if ii == 0:
                     text_box.pop()
             if jj==0:#if not record is found then delete the header info
@@ -974,20 +1098,25 @@ class MyMainWindow(QMainWindow):
             return text_box
 
         text_box = []
-        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        #paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        paper_id_list = self.pandas_model_paper_info._data[self.pandas_model_paper_info._data['select']]['paper_id'].tolist()
         tag_list = [item.text() for item in self.listWidget_tags.selectedItems()]
         if 'all' in paper_id_list:
             paper_id_list = self.get_papers_in_a_list()
         if 'all' in tag_list:
             tag_list = self.get_tags_in_a_list()
         if len(paper_id_list)==1:
-            text_box.append(paper_id_list[0])
+            # text_box.append(paper_id_list[0])
+            text_box.append('<h1 style="color:Magenta;margin-left:0px;">{}</h1>'.format(paper_id_list[0]))
             #extract paper info
-            text_box.append('##paper_info##')
+            # text_box.append('##paper_info##')
+            text_box.append('<h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('##paper_info##'))
+            #text_box.append('##paper_info##')
             target = self.database.paper_info.find_one({'paper_id':paper_id_list[0]})
             keys = ['first_author','journal','year','title','url','doi']
             for each_key in keys:
-                text_box.append('{}:  {}'.format('  '+each_key,target[each_key]))
+                # text_box.append('{}:  {}'.format('  '+each_key,target[each_key]))
+                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}:  {}'.format('  '+each_key,target[each_key])))
             collections = ['questions','methods','results','discussions','terminology','grammer']
             for each in collections:
                 text_box = make_text(text_box, each)
@@ -998,13 +1127,16 @@ class MyMainWindow(QMainWindow):
                 # tag_names = [each_item['tag_name'] for each_item in self.database.tag_info.find({'collection_name':each})]
                 for each_tag in tag_list:
                     text_box = make_text2(text_box, each, each_tag, paper_id_list)
-        self.plainTextEdit_query_info.setPlainText('\n'.join(text_box))
+        # self.plainTextEdit_query_info.setPlainText('\n'.join(text_box))
+        self.plainTextEdit_query_info.setHtml(''.join(text_box))
+        self.tabWidget.setCurrentIndex(1)
 
     def extract_info_with_tag_for_one_paper(self,paper,tag):
         return list(self.database[paper].find({'tag_name':tag}))
     
     def open_url_in_webbrowser(self):
-        paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        # paper_id_list = [item.text() for item in self.listWidget_papers.selectedItems()]
+        paper_id_list = self.pandas_model_paper_info._data[self.pandas_model_paper_info._data['select']]['paper_id'].tolist()
         if 'all' in paper_id_list:
             paper_id_list = self.get_papers_in_a_list()
         if len(paper_id_list) != 0:
@@ -1012,6 +1144,35 @@ class MyMainWindow(QMainWindow):
                 url = self.database.paper_info.find_one({'paper_id':paper_id})['url']
                 if url!='':
                     webbrowser.open(url)
+
+    def update_paper_info_once(self):
+        myquery = { "paper_id": { "$regex": ".*?"}}
+        newvalues = { "$set": { "select": 'False', "archive_date":'2020-04-20','user_label':'user_label','read_level':'0'}}
+        self.database.paper_info.update_many(myquery, newvalues)
+
+    def update_meta_info_paper(self, paper_id):
+        myquery = { "paper_id": paper_id}
+        sub_data = self.pandas_model_paper_info._data[self.pandas_model_paper_info._data['paper_id'] == paper_id]
+        newvalues = { "$set": { "select": str(sub_data['select'].tolist()[0]), "archive_date":str(sub_data['archive_date'].tolist()[0]),'user_label':str(sub_data['user_label'].tolist()[0]),'read_level':str(sub_data['read_level'].tolist()[0])}}
+        self.database.paper_info.update_one(myquery, newvalues)
+
+    def init_pandas_model_from_db(self):
+        data = {'select':[],'paper_id':[],'title':[],'year':[],'journal':[],'archive_date':[],'user_label':[],'read_level':[]}
+        for each in self.database.paper_info.find():
+            data['select'].append(each.get('select','True'))
+            data['paper_id'].append(each['paper_id'])
+            data['title'].append(each['title'])
+            data['year'].append(each['year'])
+            data['journal'].append(each['journal'])
+            data['archive_date'].append(each.get('archive_date','2020-04-20'))
+            data['user_label'].append(each.get('user_label','user_label'))
+            data['read_level'].append(each.get('read_level','0'))
+        data = pd.DataFrame(data)
+        data['select'] = data['select'].astype(bool)
+        self.pandas_model_paper_info = PandasModel(data = data, tableviewer = self.tableView_paper_info, main_gui = self)
+        self.tableView_paper_info.setModel(self.pandas_model_paper_info)
+        self.tableView_paper_info.resizeColumnsToContents()
+        self.tableView_paper_info.setSelectionBehavior(PyQt5.QtWidgets.QAbstractItemView.SelectRows)
 
 class NewProject(QDialog):
     def __init__(self, parent=None):

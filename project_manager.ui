@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>1027</height>
+    <height>1063</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -325,7 +325,7 @@
                   </widget>
                   <widget class="QTabWidget" name="tabWidget_2">
                    <property name="currentIndex">
-                    <number>0</number>
+                    <number>3</number>
                    </property>
                    <widget class="QWidget" name="tab_5">
                     <attribute name="title">
@@ -1203,7 +1203,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPlainTextEdit" name="plainTextEdit_query_info">
+                     <widget class="QTextEdit" name="plainTextEdit_query_info">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1214,30 +1214,6 @@
                        <font>
                         <pointsize>14</pointsize>
                        </font>
-                      </property>
-                      <property name="plainText">
-                       <string>&lt;paper_info&gt;
-first_author:
-journal:
-year:
-title:
-&lt;questions&gt;
-tag_name:tag_content
-&lt;methods&gt;
-tag_name:tag_content
-&lt;results&gt;
-tag_name:tag_content
-&lt;discussions&gt;
-tag_name:tag_content
-&lt;terminology&gt;
-tag_name:tag_content
-&lt;grammer&gt;
-action_word:action_word
-phrases:phrases
-sentence_structure:sentence_structure
-
-
-</string>
                       </property>
                      </widget>
                     </item>
@@ -1712,7 +1688,7 @@ sentence_structure:sentence_structure
   <action name="actionFitWidth">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/fitwidth.png</normaloff>../Project_Manager/icons/fitwidth.png</iconset>
+     <normaloff>icons/fitwidth.png</normaloff>icons/fitwidth.png</iconset>
    </property>
    <property name="text">
     <string>FitWidth</string>
@@ -1724,7 +1700,7 @@ sentence_structure:sentence_structure
   <action name="actionFitHeight">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/fitheight.png</normaloff>../Project_Manager/icons/fitheight.png</iconset>
+     <normaloff>icons/fitheight.png</normaloff>icons/fitheight.png</iconset>
    </property>
    <property name="text">
     <string>FitHeight</string>
@@ -1733,7 +1709,7 @@ sentence_structure:sentence_structure
   <action name="actionFitBoth">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/figpage.png</normaloff>../Project_Manager/icons/figpage.png</iconset>
+     <normaloff>icons/figpage.png</normaloff>icons/figpage.png</iconset>
    </property>
    <property name="text">
     <string>FitBoth</string>
@@ -1742,7 +1718,7 @@ sentence_structure:sentence_structure
   <action name="actionzoomin">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/zoomin.png</normaloff>../Project_Manager/icons/zoomin.png</iconset>
+     <normaloff>icons/zoomin.png</normaloff>icons/zoomin.png</iconset>
    </property>
    <property name="text">
     <string>zoomin</string>
@@ -1751,7 +1727,7 @@ sentence_structure:sentence_structure
   <action name="actionzoomout">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/zoomout.png</normaloff>../Project_Manager/icons/zoomout.png</iconset>
+     <normaloff>icons/zoomout.png</normaloff>icons/zoomout.png</iconset>
    </property>
    <property name="text">
     <string>zoomout</string>
@@ -1760,7 +1736,7 @@ sentence_structure:sentence_structure
   <action name="actionExportBiTex">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/export.png</normaloff>../Project_Manager/icons/export.png</iconset>
+     <normaloff>icons/export.png</normaloff>icons/export.png</iconset>
    </property>
    <property name="text">
     <string>ExportBiTex</string>
@@ -1772,7 +1748,7 @@ sentence_structure:sentence_structure
   <action name="actionDatabaseCloud">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/cloud.png</normaloff>../Project_Manager/icons/cloud.png</iconset>
+     <normaloff>icons/cloud.png</normaloff>icons/cloud.png</iconset>
    </property>
    <property name="text">
     <string>DatabaseCloud</string>
@@ -1784,7 +1760,7 @@ sentence_structure:sentence_structure
   <action name="actionImportBiTex">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/import.png</normaloff>../Project_Manager/icons/import.png</iconset>
+     <normaloff>icons/import.png</normaloff>icons/import.png</iconset>
    </property>
    <property name="text">
     <string>ImportBiTex</string>
@@ -1796,7 +1772,7 @@ sentence_structure:sentence_structure
   <action name="actionLocalServerOn">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/serveron2.png</normaloff>../Project_Manager/icons/serveron2.png</iconset>
+     <normaloff>icons/serveron2.png</normaloff>icons/serveron2.png</iconset>
    </property>
    <property name="text">
     <string>LocalServerOn</string>
@@ -1808,7 +1784,7 @@ sentence_structure:sentence_structure
   <action name="actionLocalServerOff">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/serveroff.png</normaloff>../Project_Manager/icons/serveroff.png</iconset>
+     <normaloff>icons/serveroff.png</normaloff>icons/serveroff.png</iconset>
    </property>
    <property name="text">
     <string>LocalServerOff</string>
@@ -1820,7 +1796,7 @@ sentence_structure:sentence_structure
   <action name="actionLocalClient">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/client.png</normaloff>../Project_Manager/icons/client.png</iconset>
+     <normaloff>icons/client.png</normaloff>icons/client.png</iconset>
    </property>
    <property name="text">
     <string>LocalClient</string>
@@ -1832,7 +1808,7 @@ sentence_structure:sentence_structure
   <action name="actionDatabaseInfo">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/info.png</normaloff>../Project_Manager/icons/info.png</iconset>
+     <normaloff>icons/info.png</normaloff>icons/info.png</iconset>
    </property>
    <property name="text">
     <string>DatabaseInfo</string>
@@ -1844,7 +1820,7 @@ sentence_structure:sentence_structure
   <action name="actionSearchDB">
    <property name="icon">
     <iconset>
-     <normaloff>../Project_Manager/icons/search.png</normaloff>../Project_Manager/icons/search.png</iconset>
+     <normaloff>icons/search.png</normaloff>icons/search.png</iconset>
    </property>
    <property name="text">
     <string>SearchDB</string>
@@ -1855,7 +1831,7 @@ sentence_structure:sentence_structure
   <customwidget>
    <class>TerminalWidget</class>
    <extends>QWidget</extends>
-   <header>terminal_widget.h</header>
+   <header location="global">terminal_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
