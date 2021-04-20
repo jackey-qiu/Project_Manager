@@ -87,11 +87,11 @@ class PandasModel(QtCore.QAbstractTableModel):
             if role in [QtCore.Qt.DisplayRole, QtCore.Qt.EditRole] and index.column()!=0:
                 return str(self._data.iloc[index.row(), index.column()])
             if role == QtCore.Qt.BackgroundRole and index.row()%2 == 0:
-                #return QtGui.QColor('lightGray')
-                return QtGui.QColor('green')
+                return QtGui.QColor('DeepSkyBlue')
+                # return QtGui.QColor('green')
             if role == QtCore.Qt.BackgroundRole and index.row()%2 == 1:
-                # return QtGui.QColor('cyan')
-                return QtGui.QColor('lightGreen')
+                return QtGui.QColor('aqua')
+                # return QtGui.QColor('lightGreen')
             if role == QtCore.Qt.ForegroundRole and index.row()%2 == 1:
                 return QtGui.QColor('black')
             if role == QtCore.Qt.CheckStateRole and index.column()==0:
@@ -505,7 +505,7 @@ class MyMainWindow(QMainWindow):
         for each in all_info:
             for each_item in each:
                 tag_list.append(each_item['tag_name'])
-        return sorted(tag_list)
+        return sorted(list(set(tag_list)))
 
     def update_tag_info_slot(self):
         collection_name = self.comboBox_section_tag_info.currentText()
@@ -760,12 +760,16 @@ class MyMainWindow(QMainWindow):
                       'title':self.lineEdit_title.setText,
                       'url':self.lineEdit_url.setText,
                       'doi':self.lineEdit_doi.setText,
-                      'abstract':self.textEdit_abstract.setPlainText,
+                      'abstract':self.textEdit_abstract.setHtml,
                       'graphical_abstract':self.load_graphical_abstract
                       }
         for key, item in paper_info.items():
             if key in target:
-                item(target[key])
+                if key == 'abstract':
+                    format_ = '<p style="color:gold;margin-left:20px;">{}</p>'.format
+                    item(format_(target[key]))
+                else:
+                    item(target[key])
             else:
                 if key == 'graphical_abstract':
                     pass
@@ -1036,24 +1040,24 @@ class MyMainWindow(QMainWindow):
         def make_text(text_box, collection):
             target = self.database[collection].find({'paper_id':paper_id_list[0]})
             # text_box.append('\n##{}##'.format(collection))
-            text_box.append('<br><h3 style="color:Magenta;margin-left:0px;">{}</h3>'.format('##{}##'.format(collection)))
+            text_box.append('<br><h3 style="color:Magenta;margin-left:0px;">{}</h3>'.format('{}'.format(collection)))
             ii = 0
             for each in target:
                 ii += 1
                 # text_box.append('  '+each['tag_name'])
-                text_box.append('<h3 style="color:green;margin-left:20px;">{}</h3>'.format(each['tag_name']))
+                text_box.append('<h3 style="color:yellow;margin-left:40px;">{}</h3>'.format(each['tag_name']))
                 for i,each_tag_content in enumerate(each['tag_content']):
                     if type(each_tag_content)==type(b''):
-                        each_tag_content = '<p style="margin-left:20px;"><img src="data:image/png;base64,{}" max-height="600px"/></p>'.format(each_tag_content.decode('utf-8'))
+                        each_tag_content = '<p style="margin-left:60px;"><img src="data:image/png;base64,{}" max-height="600px"/></p>'.format(each_tag_content.decode('utf-8'))
                         if i>=len(each['location']):
-                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][-1]),each_tag_content))
+                            text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][-1]),each_tag_content))
                         else:
-                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][i]),each_tag_content))
+                            text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][i]),each_tag_content))
                     else:
                         if i>=len(each['location']):
-                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content)))
+                            text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content)))
                         else:
-                            text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content)))
+                            text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content)))
             if ii == 0:
                 text_box.pop()
             return text_box
@@ -1061,40 +1065,43 @@ class MyMainWindow(QMainWindow):
         #extract tag conent from collection with tag_name for papers with paper_ids
         def make_text2(text_box, collection, tag_name, paper_id_list):
             # text_box.append('\n##{}##'.format(collection))
-            text_box.append('<br><h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('##{}##'.format(collection)))
+            append_times = 1
+            collection_text = '<br><h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('{}'.format(collection))
+            if collection_text not in text_box:
+                text_box.append(collection_text)
+                append_times = 2
             # text_box.append('  '+tag_name)
-            text_box.append('<h3 style="color:green;margin-left:20px;">{}</h3>'.format(tag_name))
+            text_box.append('<h3 style="color:yellow;margin-left:40px;">{}</h3>'.format(tag_name))
             jj = 0
             for paper_id in paper_id_list:
                 # text_box.append('    '+paper_id)
-                text_box.append('<h3 style="color:green;margin-left:20px;">{}</h3>'.format(paper_id))
+                text_box.append('<h3 style="color:green;margin-left:60px;">{}</h3>'.format(paper_id))
                 target = self.database[collection].find({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
                 ii = 0
                 for each in target:
                     ii += 1
                     for i,each_tag_content in enumerate(each['tag_content']):
                         if type(each_tag_content)==type(b''):
-                            each_tag_content = '<p style="margin-left:20px;"><img src="data:image/png;base64,{}" max-height="600px"/></p>'.format(each_tag_content.decode('utf-8'))
-                            # each_tag_content = '<img style="margin-left:20px;" src="data:image/png;base64,{}" height="400"/>'.format(each_tag_content.decode('utf-8'))
-                            jj+=1
+                            each_tag_content = '<p style="margin-left:60px;"><img src="data:image/png;base64,{}" max-height="600px"/></p>'.format(each_tag_content.decode('utf-8'))
+                            # jj+=1
                             if i>=len(each['location']):
-                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][-1]),each_tag_content))
+                                text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][-1]),each_tag_content))
                                 jj+=1
                             else:
-                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][i]),each_tag_content))
+                                text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>{}'.format('{}.@(page_{}):'.format(i+1,each['location'][i]),each_tag_content))
                                 jj+=1
                         else:
                             if i>=len(each['location']):
-                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content)))
+                                text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][-1],each_tag_content)))
                                 jj+=1
                             else:
-                                text_box.append('<p style="color:white;margin-left:20px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content)))
+                                text_box.append('<p style="color:white;margin-left:60px;background-color: gray;">{}</p>'.format('{}.@(page_{}):{}'.format(i+1,each['location'][i],each_tag_content)))
                                 jj+=1
                 if ii == 0:
                     text_box.pop()
             if jj==0:#if not record is found then delete the header info
-                text_box.pop()
-                text_box.pop()
+                for i in range(append_times):
+                    text_box.pop()
             return text_box
 
         text_box = []
@@ -1110,7 +1117,7 @@ class MyMainWindow(QMainWindow):
             text_box.append('<h1 style="color:Magenta;margin-left:0px;">{}</h1>'.format(paper_id_list[0]))
             #extract paper info
             # text_box.append('##paper_info##')
-            text_box.append('<h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('##paper_info##'))
+            text_box.append('<h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('paper_info'))
             #text_box.append('##paper_info##')
             target = self.database.paper_info.find_one({'paper_id':paper_id_list[0]})
             keys = ['first_author','journal','year','title','url','doi']
