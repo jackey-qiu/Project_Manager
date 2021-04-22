@@ -1095,6 +1095,13 @@
                       </property>
                      </spacer>
                     </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_parse_row">
+                      <property name="text">
+                       <string>ParseSelectedRow</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </item>
                   <item>

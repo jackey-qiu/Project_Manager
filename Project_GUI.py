@@ -220,6 +220,7 @@ class MyMainWindow(QMainWindow):
         self.comboBox_section_tag_info.currentIndexChanged.connect(self.update_tag_list_in_combo)
         self.pushButton_update_tag_info.clicked.connect(self.update_tag_info_slot)
         self.pushButton_append_info_new_input.clicked.connect(self.append_new_input)
+        self.pushButton_parse_row.clicked.connect(self.parse_selected_row_info)
         # self.comboBox_pick_paper.activated.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
         # self.comboBox_pick_paper.currentIndexChanged.connect(lambda:self.lineEdit_paper_id_figure.setText(self.comboBox_pick_paper.currentText()))
         self.pushButton_update_paper.clicked.connect(self.update_paper_info)
@@ -257,6 +258,9 @@ class MyMainWindow(QMainWindow):
         # self.pushButton_save_figure.clicked.connect(self.save_figure_to_filesystem)
         self.pushButton_select_all.clicked.connect(self.select_all)
         self.pushButton_select_none.clicked.connect(self.select_none)
+
+    def parse_selected_row_info(self):
+        self.comboBox_papers.setCurrentText(self.pandas_model_paper_info._data['paper_id'].tolist()[self.tableView_paper_info.selectionModel().selectedRows()[0].row()])
 
     def select_all(self):
         self.pandas_model_paper_info._data['select'] = True
@@ -1164,11 +1168,11 @@ class MyMainWindow(QMainWindow):
         self.database.paper_info.update_one(myquery, newvalues)
 
     def init_pandas_model_from_db(self):
-        data = {'select':[],'paper_id':[],'title':[],'year':[],'journal':[],'archive_date':[],'user_label':[],'read_level':[]}
+        data = {'select':[],'paper_id':[],'year':[],'journal':[],'archive_date':[],'user_label':[],'read_level':[]}
         for each in self.database.paper_info.find():
             data['select'].append(each.get('select','True'))
             data['paper_id'].append(each['paper_id'])
-            data['title'].append(each['title'])
+            # data['title'].append(each['title'])
             data['year'].append(each['year'])
             data['journal'].append(each['journal'])
             data['archive_date'].append(each.get('archive_date','2020-04-20'))
