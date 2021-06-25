@@ -112,7 +112,7 @@ class PandasModel(QtCore.QAbstractTableModel):
         else:
             if str(value)!='':
                 self._data.iloc[index.row(),index.column()] = str(value)
-        if self._data.columns.tolist()[index.column()] in ['select','archive_data','user_label','read_level']:
+        if self._data.columns.tolist()[index.column()] in ['select','archive_date','user_label','read_level']:
             self.main_gui.update_meta_info_paper(paper_id = self._data['paper_id'][index.row()])
         self.dataChanged.emit(index, index)
         self.layoutAboutToBeChanged.emit()
@@ -872,6 +872,10 @@ class MyMainWindow(QMainWindow):
                       'abstract':self.textEdit_abstract.toPlainText().replace('\n',' '),
                       'graphical_abstract':self.base64_string_temp
                     }
+        paper_info_new['select'] = original['select']
+        paper_info_new['archive_date'] = original['archive_date']
+        paper_info_new['user_label'] = original['user_label']
+        paper_info_new['read_level'] = original['read_level']
         try:        
             reply = QMessageBox.question(self, 'Message', 'Would you like to update your database with new input?', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if reply == QMessageBox.Yes:
@@ -1164,6 +1168,7 @@ class MyMainWindow(QMainWindow):
     def update_meta_info_paper(self, paper_id):
         myquery = { "paper_id": paper_id}
         sub_data = self.pandas_model_paper_info._data[self.pandas_model_paper_info._data['paper_id'] == paper_id]
+        # print(sub_data)
         newvalues = { "$set": { "select": str(sub_data['select'].tolist()[0]), "archive_date":str(sub_data['archive_date'].tolist()[0]),'user_label':str(sub_data['user_label'].tolist()[0]),'read_level':str(sub_data['read_level'].tolist()[0])}}
         self.database.paper_info.update_one(myquery, newvalues)
 
