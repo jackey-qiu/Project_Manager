@@ -41,6 +41,9 @@ from PIL import ImageGrab
 import io
 import codecs
 
+# import ray
+# ray.init()
+
 def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warning'][0]):
     msg = QMessageBox()
     if window_title == 'Error':
@@ -1043,6 +1046,8 @@ class MyMainWindow(QMainWindow):
         except Exception as e:
             error_pop_up('Failure to append paper info!\n{}'.format(str(e)),'Error')
 
+
+
     def extract_all_info(self):
         #extract tag content from collection
         def make_text(text_box, collection):
@@ -1071,8 +1076,13 @@ class MyMainWindow(QMainWindow):
             return text_box
 
         #extract tag conent from collection with tag_name for papers with paper_ids
+        #@ray.remote
         def make_text2(text_box, collection, tag_name, paper_id_list):
+        #def make_text2(text_box, collection, tag_name, paper_id_list):
             # text_box.append('\n##{}##'.format(collection))
+            if collection not in self.database.list_collection_names():
+                return text_box
+            paper_id_list = list(set([each['paper_id'] for each in self.database[collection].find({})]))
             append_times = 1
             collection_text = '<br><h2 style="color:Magenta;margin-left:0px;">{}</h2>'.format('{}'.format(collection))
             if collection_text not in text_box:
@@ -1081,10 +1091,13 @@ class MyMainWindow(QMainWindow):
             # text_box.append('  '+tag_name)
             text_box.append('<h3 style="color:yellow;margin-left:40px;">{}</h3>'.format(tag_name))
             jj = 0
+            print('Working on {}'.format(tag_name))
             for paper_id in paper_id_list:
+                print('  Working on {}'.format(paper_id))
                 # text_box.append('    '+paper_id)
                 text_box.append('<h3 style="color:green;margin-left:60px;">{}</h3>'.format(paper_id))
                 target = self.database[collection].find({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
+                # target = database[collection].find({'$and':[{'paper_id':paper_id},{'tag_name':tag_name}]})
                 ii = 0
                 for each in target:
                     ii += 1
@@ -1137,9 +1150,14 @@ class MyMainWindow(QMainWindow):
                 text_box = make_text(text_box, each)
         elif len(paper_id_list)>1:
             collections = ['questions','methods','results','discussions','terminology','grammer']
+            collections = [each for each in collections if each in self.database.list_collection_names()]
             for each in collections:
                 # tag_names = [each_item['tag_name'] for each_item in self.database.tag_info.find({'collection_name':each})]
                 # tag_names = [each_item['tag_name'] for each_item in self.database.tag_info.find({'collection_name':each})]
+                # text_makers = [make_text_ray.remote(each, each_tag, paper_id_list, self.database) for each_tag in tag_list]
+                # [maker.make_text.remote() for maker in text_makers]
+                # results = [maker.get_text_box.remote() for maker in text_makers]
+                # text_box = sum(ray.get(results),[])
                 for each_tag in tag_list:
                     text_box = make_text2(text_box, each, each_tag, paper_id_list)
         # self.plainTextEdit_query_info.setPlainText('\n'.join(text_box))
