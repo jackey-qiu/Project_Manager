@@ -90,10 +90,12 @@ class PandasModel(QtCore.QAbstractTableModel):
             if role in [QtCore.Qt.DisplayRole, QtCore.Qt.EditRole] and index.column()!=0:
                 return str(self._data.iloc[index.row(), index.column()])
             if role == QtCore.Qt.BackgroundRole and index.row()%2 == 0:
-                return QtGui.QColor('DeepSkyBlue')
+                return QtGui.QColor('green')
+                # return QtGui.QColor('DeepSkyBlue')
                 # return QtGui.QColor('green')
             if role == QtCore.Qt.BackgroundRole and index.row()%2 == 1:
-                return QtGui.QColor('aqua')
+                return QtGui.QColor('white')
+                # return QtGui.QColor('aqua')
                 # return QtGui.QColor('lightGreen')
             if role == QtCore.Qt.ForegroundRole and index.row()%2 == 1:
                 return QtGui.QColor('black')
