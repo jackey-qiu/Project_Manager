@@ -33,6 +33,7 @@ except:
 import sys,os
 import subprocess
 from pymongo import MongoClient
+import certifi
 import webbrowser
 import qpageview.viewactions
 import base64
@@ -395,7 +396,7 @@ class MyMainWindow(QMainWindow):
                 error_pop_up('You should create a file named atlas_password under Project_Manager/private folder, where you save the password for your MongoDB atlas cloud account')
             else:
                 with open(os.path.join(script_path,'private','atlas_password')) as f:
-                    self.mongo_client = MongoClient(f.read().rstrip())
+                    self.mongo_client = MongoClient(f.read().rstrip(),tlsCAFile=certifi.where())
                     self.comboBox_project_list.clear()
                     self.comboBox_project_list.addItems(self.get_database_in_a_list())
         except Exception as e:
