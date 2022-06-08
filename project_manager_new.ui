@@ -632,7 +632,7 @@
                       <widget class="QTextEdit" name="textEdit_tag_content_new_input">
                        <property name="font">
                         <font>
-                         <pointsize>14</pointsize>
+                         <pointsize>12</pointsize>
                         </font>
                        </property>
                        <property name="acceptRichText">
@@ -830,7 +830,7 @@
                     <widget class="QTextEdit" name="textEdit_tag_conent">
                      <property name="font">
                       <font>
-                       <pointsize>14</pointsize>
+                       <pointsize>12</pointsize>
                       </font>
                      </property>
                      <property name="acceptRichText">
@@ -947,7 +947,7 @@
                      </property>
                      <property name="minimumSize">
                       <size>
-                       <width>120</width>
+                       <width>400</width>
                        <height>0</height>
                       </size>
                      </property>
@@ -995,7 +995,7 @@
                   <widget class="QTextEdit" name="textEdit_tag_info">
                    <property name="font">
                     <font>
-                     <pointsize>14</pointsize>
+                     <pointsize>12</pointsize>
                     </font>
                    </property>
                    <property name="acceptRichText">
@@ -1043,13 +1043,103 @@
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_21">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_11">
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_14">
+                 <widget class="QSplitter" name="splitter_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <widget class="QFrame" name="frame_3">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_11">
                     <item>
-                     <widget class="QLabel" name="label_2">
+                     <layout class="QHBoxLayout" name="horizontalLayout_14">
+                      <item>
+                       <widget class="QLabel" name="label_2">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="text">
+                         <string>Papers</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_select_all">
+                        <property name="text">
+                         <string>selectAll</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_select_none">
+                        <property name="text">
+                         <string>selectNone</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_extract_selected">
+                        <property name="text">
+                         <string>NotesforSelected</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_parse_row">
+                        <property name="text">
+                         <string>ParseSelectedRow</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_3">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QTableView" name="tableView_paper_info">
+                      <property name="sortingEnabled">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QFrame" name="frame_8">
+                   <property name="maximumSize">
+                    <size>
+                     <width>550</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_5">
+                    <item>
+                     <widget class="QLabel" name="label_4">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1057,102 +1147,37 @@
                        </sizepolicy>
                       </property>
                       <property name="text">
-                       <string>Papers</string>
+                       <string>Tags</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_select_all">
-                      <property name="text">
-                       <string>selectAll</string>
+                     <widget class="QListWidget" name="listWidget_tags">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
                       </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="pushButton_select_none">
-                      <property name="text">
-                       <string>selectNone</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="pushButton_extract_selected">
-                      <property name="text">
-                       <string>ExtractSelected</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_3">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
+                      <property name="maximumSize">
                        <size>
-                        <width>40</width>
-                        <height>20</height>
+                        <width>500</width>
+                        <height>16777215</height>
                        </size>
                       </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="pushButton_parse_row">
-                      <property name="text">
-                       <string>ParseSelectedRow</string>
+                      <property name="font">
+                       <font>
+                        <pointsize>12</pointsize>
+                       </font>
+                      </property>
+                      <property name="selectionMode">
+                       <enum>QAbstractItemView::ExtendedSelection</enum>
                       </property>
                      </widget>
                     </item>
                    </layout>
-                  </item>
-                  <item>
-                   <widget class="QTableView" name="tableView_paper_info">
-                    <property name="sortingEnabled">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_5">
-                  <item>
-                   <widget class="QLabel" name="label_4">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Tags</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QListWidget" name="listWidget_tags">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>200</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <pointsize>14</pointsize>
-                     </font>
-                    </property>
-                    <property name="selectionMode">
-                     <enum>QAbstractItemView::ExtendedSelection</enum>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                  </widget>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -1425,7 +1450,7 @@
      <x>0</x>
      <y>0</y>
      <width>1920</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -1604,7 +1629,7 @@
   <customwidget>
    <class>TerminalWidget</class>
    <extends>QWidget</extends>
-   <header location="global">terminal_widget.h</header>
+   <header>terminal_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
