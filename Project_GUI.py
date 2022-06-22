@@ -1,4 +1,5 @@
 import sys,os,qdarkstyle
+from dotenv import load_dotenv
 import ntpath
 import fitz
 import bibtexparser
@@ -398,12 +399,19 @@ class MyMainWindow(QMainWindow):
     def start_mongo_client_cloud(self):
         try:
             if not os.path.exists(os.path.join(script_path,'private','atlas_password')):
-                error_pop_up('You should create a file named atlas_password under Project_Manager/private folder, where you save the password for your MongoDB atlas cloud account')
+                error_pop_up('You should create a file named atlas_password under Project_Manager/private folder, \
+                                where you save the atlas url link for your MongoDB atlas cloud account. \
+                                please use the format ATLAS_URL="URL LINK"')
             else:
-                with open(os.path.join(script_path,'private','atlas_password')) as f:
-                    self.mongo_client = MongoClient(f.read().rstrip(),tlsCAFile=certifi.where())
+                env = load_dotenv(os.path.join(script_path,'private','atlas_password'))
+                if env:
+                    url = os.getenv('ATLAS_URL') 
+                    self.mongo_client = MongoClient(url,tlsCAFile=certifi.where())
                     self.comboBox_project_list.clear()
                     self.comboBox_project_list.addItems(self.get_database_in_a_list())
+                else:
+                    url = ''
+                    print('something is wrong')
         except Exception as e:
             error_pop_up('Fail to start mongo client.'+'\n{}'.format(str(e)),'Error')
 
