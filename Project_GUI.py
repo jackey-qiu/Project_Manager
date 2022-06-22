@@ -1,7 +1,11 @@
 import sys,os,qdarkstyle
 from dotenv import load_dotenv
 import ntpath
-import fitz
+use_external_pdf_engine = False
+try:
+    import fitz
+except:
+    use_external_pdf_engine = True
 import bibtexparser
 from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
@@ -253,8 +257,8 @@ class MyMainWindow(QMainWindow):
         self.pushButton_extract_selected.clicked.connect(self.extract_all_info)
         #open link or pdf 
         # self.pushButton_open_url.clicked.connect(self.open_url_in_webbrowser)
-        self.pushButton_open_pdf.clicked.connect(lambda:self.open_pdf_file(use_external_app=False))
-        self.pushButton_pdf_to_image.clicked.connect(lambda:self.open_pdf_file(use_external_app=False))
+        self.pushButton_open_pdf.clicked.connect(lambda:self.open_pdf_file(use_external_app=use_external_pdf_engine))
+        self.pushButton_pdf_to_image.clicked.connect(lambda:self.open_pdf_file(use_external_app=use_external_pdf_engine))
         self.pushButton_pdf_to_image.clicked.connect(lambda:self.action_pdf.fit_width.trigger())
         #controls of figures
         self.pushButton_paste_image.clicked.connect(lambda:self.paste_image_to_viewer_from_clipboard(self.widget_view,'base64_string_temp'))
